@@ -12,6 +12,7 @@ import pandas as pd
 from src.utils import set_seed
 
 ArchitectureName = Literal["lstm", "gru"]
+TargetTransformName = Literal["none", "standardize", "log_standardize"]
 
 
 @dataclass(frozen=True)
@@ -26,6 +27,13 @@ class RNNTrainingConfig:
     epochs: int = 40
     patience: int = 6
     seed: int = 42
+    scale_features: bool = True
+    scale_target: bool = True
+    target_transform: TargetTransformName = "log_standardize"
+    log_garch_features: bool = True
+    garch_feature_prefix: str = "garch_"
+    eps: float = 1e-8
+    force_linear_output: bool = True
 
 
 def default_feature_columns(variant: str) -> list[str]:
@@ -236,8 +244,140 @@ def _append_frame(df: pd.DataFrame, path: Path | None) -> None:
     if path is None or df.empty:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists() and path.stat().st_size > 0:
+        header = pd.read_csv(path, nrows=0).columns.tolist()
+        if header != df.columns.tolist():
+            raise ValueError(
+                f"Existing file schema mismatch at {path}. "
+                "Use resume=False or delete the existing file before rerun."
+            )
     write_header = (not path.exists()) or path.stat().st_size == 0
     df.to_csv(path, mode="a", header=write_header, index=False)
+
+
+def _safe_std(values: np.ndarray, floor: float = 1e-8) -> np.ndarray:
+    std = np.asarray(values, dtype=np.float32)
+    return np.where(std < floor, 1.0, std)
+
+
+def _standardize_features_from_train(
+    X_train: np.ndarray,
+    X_val: np.ndarray,
+    X_test: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Standardize feature tensors with train-only mean/std."""
+    feature_mean = X_train.mean(axis=(0, 1), keepdims=True)
+    feature_std = _safe_std(X_train.std(axis=(0, 1), keepdims=True))
+
+    X_train_scaled = ((X_train - feature_mean) / feature_std).astype(np.float32)
+    X_val_scaled = ((X_val - feature_mean) / feature_std).astype(np.float32)
+    X_test_scaled = ((X_test - feature_mean) / feature_std).astype(np.float32)
+    return X_train_scaled, X_val_scaled, X_test_scaled, feature_mean.squeeze(), feature_std.squeeze()
+
+
+def _standardize_target_from_train(
+    y_train: np.ndarray,
+    y_val: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, float, float]:
+    """Standardize target vectors with train-only mean/std."""
+    target_mean = float(np.mean(y_train))
+    target_std = float(_safe_std(np.array([np.std(y_train)])).reshape(-1)[0])
+    y_train_scaled = ((y_train - target_mean) / target_std).astype(np.float32)
+    y_val_scaled = ((y_val - target_mean) / target_std).astype(np.float32)
+    return y_train_scaled, y_val_scaled, target_mean, target_std
+
+
+def _transform_features_by_train_stats(
+    X_train: np.ndarray,
+    X_val: np.ndarray,
+    X_test: np.ndarray,
+    feature_cols: Sequence[str],
+    cfg: RNNTrainingConfig,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, object]]:
+    """Apply feature transforms with train-only statistics."""
+    X_train_t = X_train.astype(np.float32).copy()
+    X_val_t = X_val.astype(np.float32).copy()
+    X_test_t = X_test.astype(np.float32).copy()
+
+    garch_log_indices: list[int] = []
+    if cfg.log_garch_features:
+        prefix = cfg.garch_feature_prefix.lower()
+        garch_log_indices = [i for i, col in enumerate(feature_cols) if str(col).lower().startswith(prefix)]
+        for idx in garch_log_indices:
+            X_train_t[:, :, idx] = np.log(np.clip(X_train_t[:, :, idx], cfg.eps, None))
+            X_val_t[:, :, idx] = np.log(np.clip(X_val_t[:, :, idx], cfg.eps, None))
+            X_test_t[:, :, idx] = np.log(np.clip(X_test_t[:, :, idx], cfg.eps, None))
+
+    if cfg.scale_features:
+        X_train_t, X_val_t, X_test_t, feature_mean, feature_std = _standardize_features_from_train(
+            X_train_t,
+            X_val_t,
+            X_test_t,
+        )
+    else:
+        feature_mean = np.zeros(X_train_t.shape[-1], dtype=np.float32)
+        feature_std = np.ones(X_train_t.shape[-1], dtype=np.float32)
+
+    feature_meta: dict[str, object] = {
+        "feature_cols": list(feature_cols),
+        "garch_log_indices": garch_log_indices,
+        "scale_features": cfg.scale_features,
+        "feature_mean": feature_mean.copy(),
+        "feature_std": feature_std.copy(),
+    }
+    return X_train_t, X_val_t, X_test_t, feature_meta
+
+
+def _transform_target_by_train_stats(
+    y_train: np.ndarray,
+    y_val: np.ndarray,
+    cfg: RNNTrainingConfig,
+) -> tuple[np.ndarray, np.ndarray, dict[str, object]]:
+    """Apply target transform with train-only statistics."""
+    y_train_t = y_train.astype(np.float32).copy()
+    y_val_t = y_val.astype(np.float32).copy()
+
+    if cfg.target_transform == "log_standardize":
+        if np.any(y_train_t < 0):
+            raise ValueError(
+                "target_transform='log_standardize' requires non-negative training targets. "
+                "Use 'standardize' for signed targets."
+            )
+        y_train_t = np.log(np.clip(y_train_t, cfg.eps, None))
+        y_val_t = np.log(np.clip(y_val_t, cfg.eps, None))
+    elif cfg.target_transform not in {"none", "standardize"}:
+        raise ValueError(
+            f"Unsupported target_transform='{cfg.target_transform}'. "
+            "Expected one of ['none', 'standardize', 'log_standardize']."
+        )
+
+    target_mean = 0.0
+    target_std = 1.0
+    if cfg.scale_target or cfg.target_transform == "standardize" or cfg.target_transform == "log_standardize":
+        y_train_t, y_val_t, target_mean, target_std = _standardize_target_from_train(y_train_t, y_val_t)
+
+    target_meta: dict[str, object] = {
+        "target_transform": cfg.target_transform,
+        "scale_target": cfg.scale_target or cfg.target_transform in {"standardize", "log_standardize"},
+        "target_mean": target_mean,
+        "target_std": target_std,
+        "eps": cfg.eps,
+    }
+    return y_train_t, y_val_t, target_meta
+
+
+def _inverse_target_transform(y_pred: np.ndarray, target_meta: dict[str, object]) -> np.ndarray:
+    """Inverse-transform predictions back to original target scale."""
+    out = y_pred.astype(np.float32).copy()
+    if bool(target_meta.get("scale_target", False)):
+        out = out * float(target_meta["target_std"]) + float(target_meta["target_mean"])
+
+    transform = str(target_meta.get("target_transform", "none"))
+    eps = float(target_meta.get("eps", 1e-8))
+    if transform == "log_standardize":
+        out = np.exp(out) - eps
+
+    return out
 
 
 def build_sequence_dataset(
@@ -316,8 +456,10 @@ def run_rolling_experiment(
     If `capture_gates=True`, also return gate activation dataframe.
     If output paths are provided, writes are checkpointed split-by-split.
     With `resume=True`, already completed split_ids are skipped.
+    With `resume=False`, output files are overwritten from scratch.
     `output_activation` controls final Dense activation (e.g., "softplus", "linear").
-    If `collect_last_history=True`, return epoch-wise train/val loss for the last trained split.
+    If `collect_last_history=True`, return epoch-wise train/val loss and model
+    coefficients for the last trained split.
     """
     if cfg is None:
         cfg = RNNTrainingConfig()
@@ -350,6 +492,11 @@ def run_rolling_experiment(
     train_logs_path = _normalize_path(train_logs_path)
     gates_path = _normalize_path(gates_path)
 
+    if not resume:
+        for path in (predictions_path, train_logs_path, gates_path):
+            if path is not None and path.exists():
+                path.unlink()
+
     existing_predictions = _read_if_exists(predictions_path, parse_dates=["date"]) if resume else pd.DataFrame()
     existing_train_logs = _read_if_exists(train_logs_path) if resume else pd.DataFrame()
     existing_gates = _read_if_exists(gates_path, parse_dates=["date"]) if resume else pd.DataFrame()
@@ -381,12 +528,22 @@ def run_rolling_experiment(
         if len(X_train) == 0 or len(X_val) == 0 or len(X_test) == 0:
             continue
 
+        X_train_model, X_val_model, X_test_model, feature_meta = _transform_features_by_train_stats(
+            X_train=X_train,
+            X_val=X_val,
+            X_test=X_test,
+            feature_cols=feature_cols,
+            cfg=cfg,
+        )
+        y_train_model, y_val_model, target_meta = _transform_target_by_train_stats(y_train, y_val, cfg)
+        effective_output_activation = "linear" if cfg.force_linear_output else output_activation
+
         set_seed(cfg.seed + split_id)
         model = _build_keras_model(
             architecture=architecture,
-            input_shape=(X_train.shape[1], X_train.shape[2]),
+            input_shape=(X_train_model.shape[1], X_train_model.shape[2]),
             cfg=cfg,
-            output_activation=output_activation,
+            output_activation=effective_output_activation,
         )
 
         import tensorflow as tf
@@ -401,9 +558,9 @@ def run_rolling_experiment(
         ]
 
         history = model.fit(
-            X_train,
-            y_train.reshape(-1, 1),
-            validation_data=(X_val, y_val.reshape(-1, 1)),
+            X_train_model,
+            y_train_model.reshape(-1, 1),
+            validation_data=(X_val_model, y_val_model.reshape(-1, 1)),
             epochs=cfg.epochs,
             batch_size=cfg.batch_size,
             verbose=verbose_fit,
@@ -419,6 +576,26 @@ def run_rolling_experiment(
         final_train_loss = float(loss_hist[-1])
         final_val_loss = float(val_loss_hist[-1])
         if collect_last_history:
+            recurrent_layer = model.layers[0]
+            dense_layer = model.layers[-1]
+            recurrent_weights = recurrent_layer.get_weights()
+            dense_weights = dense_layer.get_weights()
+
+            if architecture == "lstm":
+                recurrent_map = {
+                    "kernel": recurrent_weights[0].copy(),
+                    "recurrent_kernel": recurrent_weights[1].copy(),
+                    "bias": recurrent_weights[2].copy(),
+                }
+            elif architecture == "gru":
+                recurrent_map = {
+                    "kernel": recurrent_weights[0].copy(),
+                    "recurrent_kernel": recurrent_weights[1].copy(),
+                    "bias": recurrent_weights[2].copy(),
+                }
+            else:
+                recurrent_map = {}
+
             last_history = {
                 "split_id": split_id,
                 "architecture": architecture,
@@ -426,10 +603,18 @@ def run_rolling_experiment(
                 "train_loss": "mse",
                 "loss": [float(x) for x in loss_hist],
                 "val_loss": [float(x) for x in val_loss_hist],
+                "feature_meta": feature_meta,
+                "target_meta": target_meta,
+                "recurrent_weights": recurrent_map,
+                "dense_weights": {
+                    "kernel": dense_weights[0].copy(),
+                    "bias": dense_weights[1].copy(),
+                },
             }
 
-        y_pred = model.predict(X_test, verbose=0).reshape(-1)
-        if output_activation == "softplus":
+        y_pred = model.predict(X_test_model, verbose=0).reshape(-1)
+        y_pred = _inverse_target_transform(y_pred, target_meta=target_meta)
+        if output_activation == "softplus" or cfg.target_transform == "log_standardize":
             y_pred = np.clip(y_pred, 1e-12, None)
 
         pred_df = pd.DataFrame(
@@ -449,7 +634,7 @@ def run_rolling_experiment(
         if capture_gates:
             gate_df = _capture_gate_values_for_split(
                 model=model,
-                X_test=X_test,
+                X_test=X_test_model,
                 test_dates=test_dates,
                 split_id=split_id,
                 variant=variant,
@@ -466,6 +651,11 @@ def run_rolling_experiment(
                     "variant": variant,
                     "architecture": architecture,
                     "train_loss": "mse",
+                    "output_activation_used": effective_output_activation,
+                    "target_transform": target_meta["target_transform"],
+                    "target_mean": float(target_meta["target_mean"]),
+                    "target_std": float(target_meta["target_std"]),
+                    "target_eps": float(target_meta["eps"]),
                     "n_train": len(X_train),
                     "n_val": len(X_val),
                     "n_test": len(X_test),

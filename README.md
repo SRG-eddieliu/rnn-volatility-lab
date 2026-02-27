@@ -47,6 +47,7 @@ Environment note
 Long-run training note
 - Notebooks 03/04/05 checkpoint outputs split-by-split and support `resume=True`.
 - If a run is interrupted, re-run the same notebook and it will continue from missing splits.
+- With `resume=False`, output CSVs are overwritten from scratch for a clean rerun.
 
 RNN experiments (all four model families)
 - Pure LSTM: train with `MSE`
@@ -54,6 +55,12 @@ RNN experiments (all four model families)
 - Hybrid GARCH + LSTM: train with `MSE`
 - Hybrid GARCH + GRU: train with `MSE`
 - Residual Hybrid GARCH + LSTM/GRU: train with `MSE` on residual variance
+- Preprocessing is fit per rolling split using train-only statistics (no lookahead):
+  - Target (`sq_return` / positive volatility proxy): `y_log = log(y + eps)`, then standardize.
+  - Return features: standardized directly (no extra log transform).
+  - GARCH feature(s): `log(garch_value + eps)` then standardize.
+  - Residual-hybrid target (`residual_var`): standardized (no log; target is signed).
+- RNN output layer uses linear activation; predictions are inverse-transformed back to original scale.
 
 Evaluation metrics
 - `MSE` (variance forecast error)
