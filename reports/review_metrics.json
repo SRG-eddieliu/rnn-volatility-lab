@@ -1,0 +1,452 @@
+{
+  "date": "2026-09-24",
+  "scope": "Independent recomputation of saved predictions; no model retraining",
+  "native": {
+    "GARCH-t": {
+      "n": 4515,
+      "mse": 3.033149582100857e-07,
+      "qlike": -8.08893903008418,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-01-05",
+      "date_end": "2024-12-11"
+    },
+    "Pure LSTM": {
+      "n": 4515,
+      "mse": 3.537221242645756e-07,
+      "qlike": -5.286386587607862,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-01-05",
+      "date_end": "2024-12-11"
+    },
+    "Pure GRU": {
+      "n": 4515,
+      "mse": 3.532426428897501e-07,
+      "qlike": -3.792359872562816,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-01-05",
+      "date_end": "2024-12-11"
+    },
+    "Feature LSTM": {
+      "n": 4473,
+      "mse": 3.602507814712614e-07,
+      "qlike": -4.08804264499006,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    },
+    "Feature GRU": {
+      "n": 4473,
+      "mse": 3.5727418352884047e-07,
+      "qlike": -2.5066460227822778,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    },
+    "Residual LSTM": {
+      "n": 4473,
+      "mse": 2.8604488992994036e-07,
+      "qlike": 858837.1158843137,
+      "near_zero": 99,
+      "at_floor": 99,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    },
+    "Residual GRU": {
+      "n": 4473,
+      "mse": 3.08243587106469e-07,
+      "qlike": 4000312.632581846,
+      "near_zero": 297,
+      "at_floor": 297,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    }
+  },
+  "common": {
+    "GARCH-t": {
+      "n": 4473,
+      "mse": 3.0581022306843176e-07,
+      "qlike": -8.08582891851589,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    },
+    "Pure LSTM": {
+      "n": 4473,
+      "mse": 3.566812057569322e-07,
+      "qlike": -5.272290373497502,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    },
+    "Pure GRU": {
+      "n": 4473,
+      "mse": 3.5619522772040636e-07,
+      "qlike": -3.776601387727309,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    },
+    "Feature LSTM": {
+      "n": 4473,
+      "mse": 3.602507814712614e-07,
+      "qlike": -4.08804264499006,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    },
+    "Feature GRU": {
+      "n": 4473,
+      "mse": 3.5727418352884047e-07,
+      "qlike": -2.5066460227822778,
+      "near_zero": 0,
+      "at_floor": 0,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    },
+    "Residual LSTM": {
+      "n": 4473,
+      "mse": 2.8604488992994036e-07,
+      "qlike": 858837.1158843137,
+      "near_zero": 99,
+      "at_floor": 99,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    },
+    "Residual GRU": {
+      "n": 4473,
+      "mse": 3.08243587106469e-07,
+      "qlike": 4000312.632581846,
+      "near_zero": 297,
+      "at_floor": 297,
+      "date_start": "2007-03-08",
+      "date_end": "2024-12-11"
+    }
+  },
+  "floor_sensitivity": {
+    "GARCH-t": {
+      "1e-12": -8.08582891851589,
+      "1e-10": -8.08582891851589,
+      "1e-08": -8.08582891851589,
+      "1e-06": -8.08582891851589
+    },
+    "Pure LSTM": {
+      "1e-12": -5.272290373497502,
+      "1e-10": -5.272290373497502,
+      "1e-08": -5.272290373497502,
+      "1e-06": -5.272290373497502
+    },
+    "Pure GRU": {
+      "1e-12": -3.776601387727309,
+      "1e-10": -3.776601387727309,
+      "1e-08": -3.776601387727309,
+      "1e-06": -3.776601387727309
+    },
+    "Feature LSTM": {
+      "1e-12": -4.08804264499006,
+      "1e-10": -4.08804264499006,
+      "1e-08": -4.08804264499006,
+      "1e-06": -4.08804264499006
+    },
+    "Feature GRU": {
+      "1e-12": -2.5066460227822778,
+      "1e-10": -2.5066460227822778,
+      "1e-08": -2.5066460227822778,
+      "1e-06": -2.5066460227822778
+    },
+    "Residual LSTM": {
+      "1e-12": 858837.1158843137,
+      "1e-10": 8580.029943679725,
+      "1e-08": 77.55999031629277,
+      "1e-06": -7.384413689490946
+    },
+    "Residual GRU": {
+      "1e-12": 4000312.632581846,
+      "1e-10": 39997.212391503905,
+      "1e-08": 394.36090772921324,
+      "1e-06": -4.224425816526204
+    }
+  },
+  "common_n": 4473,
+  "max_target_rounding_difference": 5.196390019668318e-10,
+  "stored_metric_reconciliation": [
+    {
+      "model": "GARCH-t",
+      "mse_delta": 0.0,
+      "qlike_delta": 0.0,
+      "count_matches": true
+    },
+    {
+      "model": "Pure LSTM",
+      "mse_delta": 0.0,
+      "qlike_delta": 0.0,
+      "count_matches": true
+    },
+    {
+      "model": "Pure GRU",
+      "mse_delta": 0.0,
+      "qlike_delta": 0.0,
+      "count_matches": true
+    },
+    {
+      "model": "Feature LSTM",
+      "mse_delta": 0.0,
+      "qlike_delta": 0.0,
+      "count_matches": true
+    },
+    {
+      "model": "Feature GRU",
+      "mse_delta": -5.293955920339377e-23,
+      "qlike_delta": 0.0,
+      "count_matches": true
+    },
+    {
+      "model": "Residual LSTM",
+      "mse_delta": 0.0,
+      "qlike_delta": 0.0,
+      "count_matches": true
+    },
+    {
+      "model": "Residual GRU",
+      "mse_delta": 0.0,
+      "qlike_delta": 0.0,
+      "count_matches": true
+    }
+  ],
+  "garch_flatness": {
+    "same_as_previous": 4300,
+    "transitions": 4514,
+    "share_repeated": 0.9525919361984936,
+    "max_run": 21,
+    "median_run": 21.0
+  },
+  "garch_mock_regression": {
+    "forecast_before_shock": 0.0001,
+    "forecast_after_shock": 0.0001,
+    "description": "Existing control flow tested with a mocked fit; no new return reaches reused result between refits."
+  },
+  "transform_roundtrip": {
+    "input": [
+      1.000000013351432e-10,
+      9.99999993922529e-09,
+      9.999999974752427e-07,
+      9.999999747378752e-05
+    ],
+    "output": [
+      -2.6645352591003757e-15,
+      -2.6645352591003757e-15,
+      9.899997621687362e-07,
+      9.998999303206801e-05
+    ],
+    "epsilon": 1e-08
+  },
+  "features": {
+    "pure": [
+      "log_return",
+      "sq_return",
+      "abs_return",
+      "rv_21d"
+    ],
+    "hybrid": [
+      "log_return",
+      "sq_return",
+      "abs_return",
+      "rv_21d",
+      "garch_cond_var"
+    ]
+  },
+  "gate_stats": [
+    {
+      "architecture": "gru",
+      "variant": "hybrid",
+      "gate": "candidate_gate",
+      "n": 4473,
+      "pearson": 0.05906468446340989,
+      "spearman": 0.10513582057885504
+    },
+    {
+      "architecture": "gru",
+      "variant": "hybrid",
+      "gate": "reset_gate",
+      "n": 4473,
+      "pearson": 0.06168366241725695,
+      "spearman": -0.06207837126250613
+    },
+    {
+      "architecture": "gru",
+      "variant": "hybrid",
+      "gate": "update_gate",
+      "n": 4473,
+      "pearson": 0.08767466156814824,
+      "spearman": 0.2672386925708919
+    },
+    {
+      "architecture": "gru",
+      "variant": "hybrid_residual",
+      "gate": "candidate_gate",
+      "n": 4473,
+      "pearson": 0.024089502620463103,
+      "spearman": 0.10419824308494026
+    },
+    {
+      "architecture": "gru",
+      "variant": "hybrid_residual",
+      "gate": "reset_gate",
+      "n": 4473,
+      "pearson": 0.2698305930133877,
+      "spearman": 0.23185645851462516
+    },
+    {
+      "architecture": "gru",
+      "variant": "hybrid_residual",
+      "gate": "update_gate",
+      "n": 4473,
+      "pearson": -0.02579244909098689,
+      "spearman": 0.07779779200021561
+    },
+    {
+      "architecture": "gru",
+      "variant": "pure",
+      "gate": "candidate_gate",
+      "n": 4515,
+      "pearson": 0.023230535316497384,
+      "spearman": 0.07442134903744903
+    },
+    {
+      "architecture": "gru",
+      "variant": "pure",
+      "gate": "reset_gate",
+      "n": 4515,
+      "pearson": 0.226845649234046,
+      "spearman": 0.1790947405153454
+    },
+    {
+      "architecture": "gru",
+      "variant": "pure",
+      "gate": "update_gate",
+      "n": 4515,
+      "pearson": 0.11407567425239153,
+      "spearman": 0.27705361209651563
+    },
+    {
+      "architecture": "lstm",
+      "variant": "hybrid",
+      "gate": "candidate_gate",
+      "n": 4473,
+      "pearson": -0.09803602257458306,
+      "spearman": 0.04071908776598333
+    },
+    {
+      "architecture": "lstm",
+      "variant": "hybrid",
+      "gate": "forget_gate",
+      "n": 4473,
+      "pearson": -0.3217784798449677,
+      "spearman": -0.16981009119509372
+    },
+    {
+      "architecture": "lstm",
+      "variant": "hybrid",
+      "gate": "input_gate",
+      "n": 4473,
+      "pearson": 0.0816488991314288,
+      "spearman": -0.006067755455601704
+    },
+    {
+      "architecture": "lstm",
+      "variant": "hybrid",
+      "gate": "output_gate",
+      "n": 4473,
+      "pearson": -0.2652948769956589,
+      "spearman": -0.0983779243019681
+    },
+    {
+      "architecture": "lstm",
+      "variant": "hybrid_residual",
+      "gate": "candidate_gate",
+      "n": 4473,
+      "pearson": -0.1272458381126368,
+      "spearman": -0.01219271143177715
+    },
+    {
+      "architecture": "lstm",
+      "variant": "hybrid_residual",
+      "gate": "forget_gate",
+      "n": 4473,
+      "pearson": -0.10406676263599896,
+      "spearman": 0.2309107995070635
+    },
+    {
+      "architecture": "lstm",
+      "variant": "hybrid_residual",
+      "gate": "input_gate",
+      "n": 4473,
+      "pearson": 0.36212339816084366,
+      "spearman": 0.27718028744425205
+    },
+    {
+      "architecture": "lstm",
+      "variant": "hybrid_residual",
+      "gate": "output_gate",
+      "n": 4473,
+      "pearson": 0.13938292685184114,
+      "spearman": 0.32350140227334145
+    },
+    {
+      "architecture": "lstm",
+      "variant": "pure",
+      "gate": "candidate_gate",
+      "n": 4515,
+      "pearson": 0.018205466105151957,
+      "spearman": 0.043424484455668266
+    },
+    {
+      "architecture": "lstm",
+      "variant": "pure",
+      "gate": "forget_gate",
+      "n": 4515,
+      "pearson": -0.5960064723942291,
+      "spearman": -0.2206419517954548
+    },
+    {
+      "architecture": "lstm",
+      "variant": "pure",
+      "gate": "input_gate",
+      "n": 4515,
+      "pearson": 0.16695098064187047,
+      "spearman": 0.07453991095060791
+    },
+    {
+      "architecture": "lstm",
+      "variant": "pure",
+      "gate": "output_gate",
+      "n": 4515,
+      "pearson": -0.14503650493433995,
+      "spearman": 0.00021832292419744146
+    }
+  ],
+  "source_sha256": {
+    "garch_baseline_predictions.csv": "b81615bcd331974dd9bed4ff4c5aced8c30421155192f70d9cc51c8b7e2dfc76",
+    "pure_lstm_predictions.csv": "4051a563a7aee6276b83e223d0ccdfb99ee7f0b367bc915207dc8a652e02e7d8",
+    "pure_gru_predictions.csv": "32a3962fb2a2d7649ad50b865bf85478efe5f07b26fe718838e5d0a1362eeccf",
+    "hybrid_lstm_predictions.csv": "97e5faad4e458b5c5c2e4a83ea7c5b4ea965cdb27d9b10810774c83e5668376c",
+    "hybrid_gru_predictions.csv": "ba229f7551c7c34a921731b7a5d9be0a73d0f7c9d770e06f6d5659240110b1eb",
+    "hybrid_residual_lstm_predictions.csv": "ede23751ec313952514c81d53fb47a2d215e7d1e097260589e3692a584b694aa",
+    "hybrid_residual_gru_predictions.csv": "d01a9b210c98deeaf972e41f6a40201a31da3f2f44526457b8cc1102b82bdb6f",
+    "gate_summary_lag1_20_by_date.csv": "2aa2fafc1ba78408faa4259e4fcf0d65e2fc8b8a438c2c557c0566b5201e6442"
+  },
+  "code_blob_sha": {
+    "src/models/garch.py": "010944fb39424cdee3421f86366b30aae5e950f7",
+    "src/models/rnn.py": "59a40e38be07cc62cd25e969b6a2c07ad0275097",
+    "src/losses/__init__.py": "5b70934514a1eb89f20d362c3b34e64894b0757b",
+    "src/data/pipeline.py": "aa7e22d04496a91f8d201b8859e685df4ea3822a"
+  }
+}

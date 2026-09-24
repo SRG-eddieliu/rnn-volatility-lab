@@ -1,153 +1,54 @@
-# RNN Volatility Lab: Historical Research Report
+# Volatility Forecasting: Revised Research Note
 
-> **Historical results, pending reevaluation.** A subsequent code review identified stale GARCH forecasts between refits and unequal evaluation coverage across models. The implementation has not yet been corrected or rerun. Read the [validation status](../docs/validation-status.md) before interpreting the tables or accompanying PDFs; these rankings are not validated comparative findings. Referenced prediction CSVs and logs are generated artifacts and are not bundled with the public repository.
+**Eddie Liu** | Revised September 24, 2026
 
-## 1) Objective
-This document summarizes the full research pipeline implemented in this repository and records historical model outputs from notebooks `03` to `07`.
+> Historical forecasts, not a corrected model run. The baseline state update and target inverse still require correction. No models were retrained for this review.
 
-Project scope:
-- Compare six volatility forecasters on S&P 500 daily data (2003-2024).
-- Use an expanding-window design intended for out-of-sample evaluation; validation remains incomplete.
-- Evaluate using both MSE and QLIKE on daily variance forecasts.
+## Reports
 
-## 2) Pipeline Overview
-The workflow is organized into modular notebooks:
-1. `01_data_pipeline.ipynb`: download/clean data, engineer returns features, build rolling splits.
-2. `02_garch_baseline.ipynb`: GARCH(1,1)-t expanding-window benchmark.
-3. `03_lstm_model.ipynb`: pure LSTM rolling training/evaluation.
-4. `04_gru_model.ipynb`: pure GRU rolling training/evaluation.
-5. `05_hybrid_models.ipynb`: GARCH-feature hybrid LSTM/GRU.
-6. `05a_hybrid_residual_models.ipynb`: residual hybrids (RNN on `sq_return - garch_cond_var`).
-7. `06_evaluation_qlike.ipynb`: combined performance/diagnostics plots.
-8. `07_gate_visualization.ipynb`: LSTM/GRU gate analysis and regime diagnostics.
+- [Research note (7 pages)](volatility-research.pdf)
+- [Diagnostic appendix (6 pages)](volatility-diagnostics.pdf)
+- [Combined report (13 pages)](volatility-research-with-appendix.pdf)
+- [Aggregate review evidence and source hashes](review_metrics.json)
 
-Core modules:
-- `src/data/pipeline.py`: data download, feature engineering, rolling split generation.
-- `src/models/garch.py`: rolling GARCH fit/forecast and GARCH feature injection.
-- `src/models/rnn.py`: rolling RNN trainer, checkpointing, gate capture, transformations.
-- `src/evaluation/__init__.py` + `src/losses/__init__.py`: MSE/QLIKE computation.
+## Research Design
 
-## 3) Data, Features, and Split Design
-Dataset:
-- Ticker: `^GSPC` (daily)
-- Period: 2003-2024
+Seven specifications compare a zero-mean Student-t GARCH(1,1), pure LSTM/GRU, GARCH-feature LSTM/GRU, and additive residual LSTM/GRU. The data pipeline uses daily `^GSPC` observations over 2003-2024. Squared log return is a noisy second-moment proxy; its variance interpretation assumes a zero conditional mean.
 
-Engineered columns:
-- `log_return`
-- `sq_return` (variance proxy target for most models)
-- `abs_return`
-- `rv_21d`
-- `garch_cond_var` (for hybrid variants)
+Pure inputs are lagged log return, squared return, absolute return, and annualized 21-day rolling volatility. Hybrids also use lagged GARCH variance. Neural sequences for date t end at t-1. The expanding-window configuration uses a minimum training span of 756 observations, 252 validation observations, and non-overlapping 21-day test blocks. Warmup and sequence construction reduce effective sample sizes.
 
-Rolling split protocol:
-- `min_train_size = 756`
-- `val_size = 252`
-- `test_size = 21`
-- `step_size = 21`
-- Expanding training window
+The residual target is `squared_return - garch_variance`, not a standardized return innovation. The correction is added to the saved GARCH forecast and clipped at `1e-12`.
 
-This yields non-overlapping 21-day test blocks and strict temporal ordering.
+## Common-Date Historical Results
 
-## 4) Training-Split Transformation and Standardization
-Implemented in `src/models/rnn.py` per rolling split:
+All rows use **4,473 dates, 2007-03-08 through 2024-12-11**. This reconciles coverage, not the underlying model defects. No ranking is asserted as validated.
 
-Feature transforms (fit on train only, reused on val/test):
-- Return features: standardize directly.
-- GARCH feature(s): apply `log(garch + eps)` then standardize.
+| Saved forecast | MSE | QLIKE | Forecasts at 1e-12 |
+| --- | ---: | ---: | ---: |
+| GARCH-t | 3.058102231e-07 | -8.085829 | 0 |
+| Pure LSTM | 3.566812058e-07 | -5.272290 | 0 |
+| Pure GRU | 3.561952277e-07 | -3.776601 | 0 |
+| Feature LSTM | 3.602507815e-07 | -4.088043 | 0 |
+| Feature GRU | 3.572741835e-07 | -2.506646 | 0 |
+| Residual LSTM | 2.860448899e-07 | 858837.115884 | 99 |
+| Residual GRU | 3.082435871e-07 | 4000312.632582 | 297 |
 
-Target transforms:
-- Pure + standard hybrids (`03/04/05`):
-  - `y_log = log(y + eps)`
-  - `y_std = (y_log - mean_train) / std_train`
-- Residual hybrids (`05a`, signed target):
-  - `y_std = (y - mean_train) / std_train`
+MSE is `mean((y-h)**2)`. QLIKE is `mean(log(h)+y/h)`, clipping y and h at `1e-12`. Lower is better; QLIKE may be negative under this convention. Both MSE and QLIKE can be robust to an unbiased noisy proxy under suitable conditions; their error weighting and finite-sample behavior differ. See [Patton (2011)](https://public.econ.duke.edu/~ap172/Patton_vol_proxies_JoE_2011.pdf).
 
-Model output:
-- Linear activation (`identity`) is used for training output.
+## Material Findings
 
-Inverse transform at inference:
-- Log-standardized target: `y_hat = exp(y_hat_std * std_train + mean_train) - eps`
-- Standardized target: `y_hat = y_hat_std * std_train + mean_train`
+1. **GARCH state is stale between refits.** 4,300 of 4,514 adjacent predictions are identical. The median and maximum constant run are 21 observations. Source inspection and a mocked-fit control-flow check confirm that new returns are not incorporated between parameter refits. Baseline and dependent hybrids require regeneration.
+2. **Target transform and inverse disagree.** The forward map uses `log(max(y, eps))`, while the inverse subtracts eps after exponentiation. Even after fixing the inverse, a log-MSE objective does not generally target conditional mean variance after naive exponentiation.
+3. **Residual positivity fails.** Residual LSTM and GRU hit the floor on 99 (2.21%) and 297 (6.64%) common dates. A prediction-floor sensitivity check changes the penalty substantially, but is not a validated floor selection or a model fix.
+4. **Gate correlations do not identify mechanism or alpha.** Pure LSTM forget-gate summaries have Pearson -0.596 and Spearman -0.221 versus same-date VIX. This is an ex-post pooled diagnostic across separately trained folds, not a causal or predictive result.
+5. **Training gaps need checkpoint alignment.** Separate minima of train and validation loss can come from different epochs. Their difference is not a paired checkpoint generalization gap; different target transforms also preclude direct cross-family gap comparisons.
 
-Numerical constant:
-- `eps = 1e-8`
+## Verification Scope
 
-## 5) Historical Performance Snapshot (Pending Reevaluation)
-Source: `reports/predictions/evaluation_metrics_mse_qlike.csv`
+All seven prediction CSVs passed duplicate-date and finite-value checks. Stored native-sample metrics reconcile to rounding. Common-date targets agree within a relative tolerance of 1e-6 and absolute tolerance of 1e-12. All 21 gate/VIX Pearson correlations reconcile to the saved summary. Source hashes and focused test outputs are in [review_metrics.json](review_metrics.json). Raw prediction files are retained locally and not included in the public repository.
 
-| variant | architecture | n_obs | mse | qlike | mse_rank | qlike_rank |
-| --- | --- | --- | --- | --- | --- | --- |
-| hybrid_residual | lstm | 4473 | 2.860449e-07 | 8.588371e+05 | 1 | 6 |
-| baseline | garch11_t | 4515 | 3.033150e-07 | -8.088939 | 2 | 1 |
-| hybrid_residual | gru | 4473 | 3.082436e-07 | 4.000313e+06 | 3 | 7 |
-| pure | gru | 4515 | 3.532426e-07 | -3.792360 | 4 | 4 |
-| pure | lstm | 4515 | 3.537221e-07 | -5.286387 | 5 | 2 |
-| hybrid | gru | 4473 | 3.572742e-07 | -2.506646 | 6 | 5 |
-| hybrid | lstm | 4473 | 3.602508e-07 | -4.088043 | 7 | 3 |
+This is suitable as a portfolio discussion of research design and failure analysis, not yet a validated model ranking or production model. No trading strategy, economic backtest, multi-seed uncertainty estimate, or fresh training run is represented. See [validation status](../docs/validation-status.md).
 
+## Research Provenance
 
-Interpretation:
-- By **QLIKE rank**, `baseline garch11_t` is best in current snapshot.
-- By **MSE rank**, `hybrid_residual_lstm` appears best, but this is misleading given its QLIKE behavior (see caveat below).
-
-## 6) Overfitting Diagnostics Summary
-Source: `reports/predictions/*_train_logs.csv` (best-epoch train/val gap).
-
-| model_file | n_splits | best_gap_mean | best_gap_p95 | best_val_loss_mean |
-| --- | --- | --- | --- | --- |
-| hybrid_gru_train_logs.csv | 213 | 0.100770 | 0.594812 | 0.921707 |
-| hybrid_lstm_train_logs.csv | 213 | 0.115448 | 0.771694 | 0.933110 |
-| hybrid_residual_gru_train_logs.csv | 213 | 4.891720 | 44.537449 | 5.791817 |
-| hybrid_residual_lstm_train_logs.csv | 213 | 4.933682 | 44.762732 | 5.801875 |
-| pure_gru_train_logs.csv | 215 | 0.062556 | 0.295246 | 0.906108 |
-| pure_lstm_train_logs.csv | 215 | 0.081709 | 0.322391 | 0.923237 |
-
-
-Interpretation:
-- Pure/hybrid non-residual models show moderate average gap levels.
-- Residual hybrids show very large positive gap tails, indicating unstable validation behavior in some splits.
-
-## 7) Gate Diagnostics Snapshot
-Source: `reports/predictions/gate_vix_correlation_summary.csv` (pure LSTM subset).
-
-| gate_name | pearson_corr | corr_21d_ma | spearman_corr |
-| --- | --- | --- | --- |
-| input_gate | 0.166951 | 0.191735 | 0.074540 |
-| candidate_gate | 0.018205 | 0.016694 | 0.043424 |
-| output_gate | -0.145037 | -0.176732 | 2.183229e-04 |
-| forget_gate | -0.596006 | -0.659186 | -0.220642 |
-
-
-Interpretation (pure LSTM example):
-- `forget_gate` has strong negative correlation with VIX in current run.
-- `input_gate` is mildly positively correlated.
-- Relationship signs/magnitudes are sensitive to training regime and preprocessing choices; treat as descriptive diagnostics, not causal claims.
-
-## 8) Important Caveat: Residual-Hybrid QLIKE Explosion
-Residual hybrids currently show extreme positive QLIKE despite good MSE rank.
-
-Evidence (`hybrid_residual_*_predictions.csv`):
-| file | n_obs | pred_le_1e8_count | pred_min | pred_p01 |
-| --- | --- | --- | --- | --- |
-| hybrid_residual_lstm_predictions.csv | 4473 | 99 | 1.000000e-12 | 1.000000e-12 |
-| hybrid_residual_gru_predictions.csv | 4473 | 297 | 1.000000e-12 | 1.000000e-12 |
-
-
-Explanation:
-- QLIKE is highly sensitive to under-prediction near zero.
-- A non-trivial count of clipped near-zero predictions (`<= 1e-8`) causes very large QLIKE penalties.
-- Therefore, MSE-only ranking can disagree sharply with QLIKE ranking in these variants.
-
-## 9) Reproducibility and Execution Notes
-- RNN notebooks currently use `resume=False`, so reruns overwrite outputs cleanly.
-- Train-log schema now includes transform metadata and train/val diagnostics.
-- Keep environment consistent (`numpy<2`, TensorFlow env, `arch`, `yfinance`).
-
-## 10) What the Code Does (Short Summary)
-- Constructs rolling datasets with explicit train/validation/test boundaries; see the open validation issues above.
-- Trains each model family split-by-split with strict temporal boundaries.
-- Saves predictions, train logs, and gate values to `reports/predictions`.
-- Produces consolidated comparison metrics + diagnostic visualizations.
-
----
-Historical report retained from an earlier experiment. Validation note added 2026-09-24; no new model run or revised performance estimate is represented by this documentation update.
+The underlying experiments originated in a collaborative research project. This revised portfolio report is presented by Eddie Liu. Contributor names and course identifiers have been omitted; the byline does not imply sole authorship of the original experiments.
