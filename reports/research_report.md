@@ -1,11 +1,13 @@
-# Volatility-Blackbox Research Report
+# RNN Volatility Lab: Historical Research Report
+
+> **Historical results, pending reevaluation.** A subsequent code review identified stale GARCH forecasts between refits and unequal evaluation coverage across models. The implementation has not yet been corrected or rerun. Read the [validation status](../docs/validation-status.md) before interpreting the tables or accompanying PDFs; these rankings are not validated comparative findings. Referenced prediction CSVs and logs are generated artifacts and are not bundled with the public repository.
 
 ## 1) Objective
-This document summarizes the full research pipeline implemented in this repository and explains the latest model results produced by notebooks `03` to `07`.
+This document summarizes the full research pipeline implemented in this repository and records historical model outputs from notebooks `03` to `07`.
 
 Project scope:
 - Compare six volatility forecasters on S&P 500 daily data (2003-2024).
-- Enforce strict rolling out-of-sample evaluation with no lookahead bias.
+- Use an expanding-window design intended for out-of-sample evaluation; validation remains incomplete.
 - Evaluate using both MSE and QLIKE on daily variance forecasts.
 
 ## 2) Pipeline Overview
@@ -46,7 +48,7 @@ Rolling split protocol:
 
 This yields non-overlapping 21-day test blocks and strict temporal ordering.
 
-## 4) Transformation and Standardization (No Leakage)
+## 4) Training-Split Transformation and Standardization
 Implemented in `src/models/rnn.py` per rolling split:
 
 Feature transforms (fit on train only, reused on val/test):
@@ -70,7 +72,7 @@ Inverse transform at inference:
 Numerical constant:
 - `eps = 1e-8`
 
-## 5) Latest Performance Snapshot
+## 5) Historical Performance Snapshot (Pending Reevaluation)
 Source: `reports/predictions/evaluation_metrics_mse_qlike.csv`
 
 | variant | architecture | n_obs | mse | qlike | mse_rank | qlike_rank |
@@ -142,10 +144,10 @@ Explanation:
 - Keep environment consistent (`numpy<2`, TensorFlow env, `arch`, `yfinance`).
 
 ## 10) What the Code Does (Short Summary)
-- Builds leakage-safe rolling datasets.
+- Constructs rolling datasets with explicit train/validation/test boundaries; see the open validation issues above.
 - Trains each model family split-by-split with strict temporal boundaries.
 - Saves predictions, train logs, and gate values to `reports/predictions`.
 - Produces consolidated comparison metrics + diagnostic visualizations.
 
 ---
-Report generated from repository artifacts on current local state.
+Historical report retained from an earlier experiment. Validation note added 2026-09-24; no new model run or revised performance estimate is represented by this documentation update.
