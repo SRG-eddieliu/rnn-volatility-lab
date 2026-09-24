@@ -5,11 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, Sequence
+import logging
 
 import numpy as np
 import pandas as pd
 
 from src.utils import set_seed
+
+logger = logging.getLogger(__name__)
 
 ArchitectureName = Literal["lstm", "gru"]
 TargetTransformName = Literal["none", "standardize", "log_standardize"]
@@ -34,6 +37,7 @@ class RNNTrainingConfig:
     garch_feature_prefix: str = "garch_"
     eps: float = 1e-8
     force_linear_output: bool = True
+    unroll: bool = False
 
 
 def default_feature_columns(variant: str) -> list[str]:
@@ -41,10 +45,10 @@ def default_feature_columns(variant: str) -> list[str]:
     variant_norm = variant.strip().lower()
     if variant_norm == "pure":
         return ["log_return", "sq_return", "abs_return", "rv_21d"]
-    if variant_norm in {"hybrid", "hybrid_residual"}:
+    if variant_norm in {"hybrid", "hybrid_residual", "hybrid_log_ratio"}:
         return ["log_return", "sq_return", "abs_return", "rv_21d", "garch_cond_var"]
     raise ValueError(
-        f"Unsupported variant='{variant}'. Expected one of ['pure', 'hybrid', 'hybrid_residual']."
+        f"Unsupported variant='{variant}'. Expected pure, hybrid, hybrid_residual, or hybrid_log_ratio."
     )
 
 
@@ -56,12 +60,14 @@ def _build_keras_model(
 ):
     from tensorflow import keras
 
+    if architecture not in {"lstm", "gru"}:
+        raise ValueError(f"Unsupported architecture: {architecture}")
     layer_cls = keras.layers.LSTM if architecture == "lstm" else keras.layers.GRU
 
     model = keras.Sequential(
         [
             keras.layers.Input(shape=input_shape),
-            layer_cls(cfg.hidden_units, dropout=cfg.dropout, recurrent_dropout=0.0),
+            layer_cls(cfg.hidden_units, dropout=cfg.dropout, recurrent_dropout=0.0, unroll=cfg.unroll),
             keras.layers.Dense(1, activation=output_activation),
         ]
     )
@@ -337,10 +343,15 @@ def _transform_target_by_train_stats(
     y_train_t = y_train.astype(np.float32).copy()
     y_val_t = y_val.astype(np.float32).copy()
 
+    if cfg.eps <= 0 or not np.isfinite(cfg.eps):
+        raise ValueError("eps must be finite and positive.")
+    if not np.isfinite(y_train_t).all() or not np.isfinite(y_val_t).all():
+        raise ValueError("Targets must be finite.")
+
     if cfg.target_transform == "log_standardize":
-        if np.any(y_train_t < 0):
+        if np.any(y_train_t < 0) or np.any(y_val_t < 0):
             raise ValueError(
-                "target_transform='log_standardize' requires non-negative training targets. "
+                "target_transform='log_standardize' requires non-negative targets. "
                 "Use 'standardize' for signed targets."
             )
         y_train_t = np.log(np.clip(y_train_t, cfg.eps, None))
@@ -373,11 +384,26 @@ def _inverse_target_transform(y_pred: np.ndarray, target_meta: dict[str, object]
         out = out * float(target_meta["target_std"]) + float(target_meta["target_mean"])
 
     transform = str(target_meta.get("target_transform", "none"))
-    eps = float(target_meta.get("eps", 1e-8))
     if transform == "log_standardize":
-        out = np.exp(out) - eps
+        # The forward map clips before taking logs; it does not add epsilon.
+        out = np.exp(out)
 
     return out
+
+
+def reconstruct_log_ratio_variance(log_ratio: np.ndarray, baseline: np.ndarray) -> np.ndarray:
+    """Map a signed log-ratio correction to positive variance without a tuned floor."""
+    correction = np.asarray(log_ratio, dtype=float)
+    base = np.asarray(baseline, dtype=float)
+    if correction.shape != base.shape:
+        raise ValueError("Correction and baseline must have matching shapes.")
+    if not np.isfinite(correction).all() or not np.isfinite(base).all() or np.any(base <= 0):
+        raise ValueError("Corrections must be finite and baseline variances finite and positive.")
+    with np.errstate(over="ignore", under="ignore", invalid="ignore"):
+        result = np.exp(np.log(base) + correction)
+    if not np.isfinite(result).all() or np.any(result <= 0):
+        raise ValueError("Log-ratio reconstruction overflowed or underflowed; inspect the model.")
+    return result
 
 
 def build_sequence_dataset(
@@ -399,6 +425,8 @@ def build_sequence_dataset(
     work = df.loc[:, [date_col, *feature_cols]].copy()
     work[target_col] = df[target_col].values
     work[date_col] = pd.to_datetime(work[date_col], errors="raise")
+    if work[date_col].duplicated().any():
+        raise ValueError("Sequence dates must be unique.")
     work = work.sort_values(date_col)
     work = work.dropna().reset_index(drop=True)
 
@@ -407,6 +435,8 @@ def build_sequence_dataset(
 
     x_values = work.loc[:, feature_cols].values.astype(np.float32)
     y_values = work.loc[:, target_col].to_numpy(dtype=np.float32)
+    if not np.isfinite(x_values).all() or not np.isfinite(y_values).all():
+        raise ValueError("Sequence features and targets must be finite after dropping NaNs.")
     dates = work.loc[:, date_col].values
 
     X, y, y_dates = [], [], []
@@ -503,9 +533,28 @@ def run_rolling_experiment(
 
     completed_split_ids: set[int] = set()
     if not existing_train_logs.empty and "split_id" in existing_train_logs.columns:
-        completed_split_ids = set(existing_train_logs["split_id"].astype(int).tolist())
-    elif not existing_predictions.empty and "split_id" in existing_predictions.columns:
-        completed_split_ids = set(existing_predictions["split_id"].astype(int).tolist())
+        for row in existing_train_logs.itertuples():
+            sid = int(row.split_id)
+            pred_count = (existing_predictions.split_id.eq(sid).sum()
+                          if "split_id" in existing_predictions else 0)
+            gate_count = (existing_gates.split_id.eq(sid).sum()
+                          if "split_id" in existing_gates else 0)
+            expected_gates = int(row.n_test) * cfg.lookback * (4 if architecture == "lstm" else 3)
+            if pred_count == int(row.n_test) and (not capture_gates or gate_count == expected_gates):
+                completed_split_ids.add(sid)
+    if resume:
+        # The log is written last; incomplete append sequences must be retrained, not skipped.
+        frames = []
+        for frame, path in ((existing_predictions, predictions_path), (existing_train_logs, train_logs_path),
+                            (existing_gates, gates_path)):
+            if "split_id" in frame:
+                frame = frame[frame.split_id.isin(completed_split_ids)].copy()
+                if path is not None:
+                    temporary = path.with_suffix(path.suffix + ".tmp")
+                    frame.to_csv(temporary, index=False)
+                    temporary.replace(path)
+            frames.append(frame)
+        existing_predictions, existing_train_logs, existing_gates = frames
 
     prediction_rows = []
     train_log_rows = []
@@ -538,16 +587,17 @@ def run_rolling_experiment(
         y_train_model, y_val_model, target_meta = _transform_target_by_train_stats(y_train, y_val, cfg)
         effective_output_activation = "linear" if cfg.force_linear_output else output_activation
 
+        import tensorflow as tf
+
+        tf.keras.backend.clear_session()
         set_seed(cfg.seed + split_id)
+        tf.keras.utils.set_random_seed(cfg.seed + split_id)
         model = _build_keras_model(
             architecture=architecture,
             input_shape=(X_train_model.shape[1], X_train_model.shape[2]),
             cfg=cfg,
             output_activation=effective_output_activation,
         )
-
-        import tensorflow as tf
-        tf.keras.utils.set_random_seed(cfg.seed + split_id)
 
         callbacks = [
             tf.keras.callbacks.EarlyStopping(
@@ -575,6 +625,11 @@ def run_rolling_experiment(
         best_val_loss = float(np.min(val_loss_hist))
         final_train_loss = float(loss_hist[-1])
         final_val_loss = float(val_loss_hist[-1])
+        best_epoch = int(np.argmin(val_loss_hist)) + 1
+        checkpoint_train_loss = float(model.evaluate(X_train_model, y_train_model.reshape(-1, 1),
+                                                    batch_size=cfg.batch_size, verbose=0)[0])
+        checkpoint_val_loss = float(model.evaluate(X_val_model, y_val_model.reshape(-1, 1),
+                                                  batch_size=cfg.batch_size, verbose=0)[0])
         if collect_last_history:
             recurrent_layer = model.layers[0]
             dense_layer = model.layers[-1]
@@ -614,6 +669,8 @@ def run_rolling_experiment(
 
         y_pred = model.predict(X_test_model, verbose=0).reshape(-1)
         y_pred = _inverse_target_transform(y_pred, target_meta=target_meta)
+        if not np.isfinite(y_pred).all():
+            raise ValueError(f"Non-finite prediction in split {split_id}.")
         if output_activation == "softplus" or cfg.target_transform == "log_standardize":
             y_pred = np.clip(y_pred, 1e-12, None)
 
@@ -663,6 +720,10 @@ def run_rolling_experiment(
                     "best_train_loss": best_train_loss,
                     "best_val_loss": best_val_loss,
                     "best_gap_val_minus_train": best_val_loss - best_train_loss,
+                    "best_epoch": best_epoch,
+                    "checkpoint_train_loss": checkpoint_train_loss,
+                    "checkpoint_val_loss": checkpoint_val_loss,
+                    "checkpoint_gap_val_minus_train": checkpoint_val_loss - checkpoint_train_loss,
                     "final_train_loss": final_train_loss,
                     "final_val_loss": final_val_loss,
                     "final_gap_val_minus_train": final_val_loss - final_train_loss,
@@ -671,6 +732,8 @@ def run_rolling_experiment(
         )
         train_log_rows.append(train_row)
         _append_frame(train_row, train_logs_path)
+        logger.info("%s/%s split=%s train=%s test=%s epochs=%s checkpoint_val=%.5f",
+                    variant, architecture, split_id, len(X_train), len(X_test), len(loss_hist), checkpoint_val_loss)
 
     if not prediction_rows and existing_predictions.empty:
         raise ValueError("No predictions were generated. Check split dates and feature availability.")
@@ -733,4 +796,5 @@ __all__ = [
     "default_feature_columns",
     "build_sequence_dataset",
     "run_rolling_experiment",
+    "reconstruct_log_ratio_variance",
 ]

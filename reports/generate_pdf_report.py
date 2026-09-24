@@ -1,3 +1,9 @@
+"""Legacy diagnostic deck generator for the original experiment.
+
+For corrected-v1 results, use build_corrected_report.py and corrected_results.json.
+This script intentionally retains its historical inputs and interpretation.
+"""
+
 from __future__ import annotations
 
 from datetime import datetime
