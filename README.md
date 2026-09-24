@@ -2,14 +2,17 @@
 
 A controlled study of one-day S&P 500 variance forecasts using GARCH, LSTM, GRU, and positive hybrid models.
 
-**Status:** corrected historical walk-forward experiment. The original implementation defects have been repaired and regression-tested. This is a single-seed research prototype, not a trading-alpha claim or production model.
+**Status:** corrected historical walk-forward experiments, including the restored additive-residual LSTM control. The original implementation defects have been repaired and regression-tested. This is a single-seed research prototype, not a trading-alpha claim or production model.
 
 ## Research and Results
 
-- [Research study (8 pages)](reports/volatility-research.pdf)
-- [Technical appendix (5 pages)](reports/volatility-diagnostics.pdf)
-- [Combined report (13 pages)](reports/volatility-research-with-appendix.pdf)
-- [Results summary](reports/research_report.md)
+- [Latest: additive residual follow-up (4 pages)](reports/volatility-additive-residual.pdf)
+- [Combined follow-up, original corrected study, and appendix (17 pages)](reports/volatility-research-with-appendix.pdf)
+- [Additive comparison and evidence](reports/additive_residual_report.md)
+- [Additive aggregate results and source hashes](reports/additive_results.json)
+- [Original corrected study (8 pages)](reports/volatility-research.pdf)
+- [Original corrected technical appendix (5 pages)](reports/volatility-diagnostics.pdf)
+- [Original nine-specification results summary](reports/research_report.md)
 - [Aggregate results, uncertainty estimates, and source hashes](reports/corrected_results.json)
 - [Experiment plan](docs/corrected-experiment-plan.md)
 - [Validation scope and remaining limitations](docs/validation-status.md)
@@ -18,14 +21,16 @@ The corrected run compares **nine forecast specifications on 3,738 identical dat
 
 Results are reported whether or not a neural model improves on a simple baseline. The analysis distinguishes implementation correctness, positivity, calibration, and loss-based performance. No strategy P&L or Sharpe-ratio improvement is claimed.
 
-**Primary-run result:** GARCH-t has the lowest MSE and QLIKE point estimates. Its QLIKE is -8.4613 versus -6.6595 for the best neural QLIKE candidate, Ratio LSTM (lower is better). Neural mean variance forecasts are only 0.256-0.299 times the mean squared-return proxy. Positive reconstruction fixes invalid outputs but does not solve log-objective calibration.
+**Latest additive result:** restoring the original signed-residual MSE objective lowers observed MSE by **5.48%** versus corrected GARCH, from `1.600623e-7` to `1.512933e-7` after the original fixed floor. The unbounded version improves MSE by **5.45%**, so the change is not mainly a clipping effect. However, there are **60 nonpositive raw forecasts**, clipped QLIKE is approximately **457,801** versus GARCH's **-8.4613**, and the 95% paired temporal interval for the MSE difference includes zero. This is an observed MSE improvement, not demonstrated robust or deployable variance forecasting.
+
+The additive follow-up fits one additional LSTM across the same 178 folds, with unchanged data, benchmark files, architecture, seed schedule, and training budget. It is separate from the initial nine-specification run. In that initial run, GARCH beat the log-target and log-ratio candidates in MSE and QLIKE. The two objectives must not be conflated; see the [fixed follow-up plan](docs/additive-residual-plan.md).
 
 ## What Was Corrected
 
 1. **GARCH state updating:** new returns update conditional variance every day, even when parameters are held fixed between 21-observation refits.
 2. **Target inverse:** `log(max(y, eps))` is inverted by exponentiation, without an inconsistent epsilon subtraction.
 3. **Comparable neural histories:** all neural candidates now have identical train/validation/test dates and a full initial training history after GARCH warmup.
-4. **Positive hybrid forecasts:** new log-ratio hybrids use `h = g * exp(predicted_log_ratio)`. These replace, rather than relabel, the original additive residual specification.
+4. **Distinct hybrid objectives:** log-ratio hybrids use `h = g * exp(predicted_log_ratio)` for positivity. The subsequent additive control restores `h = g + predicted_residual` and original-scale residual MSE, retaining raw and fixed-floor outputs separately.
 5. **Reproducibility and diagnostics:** seeds are set before model construction; checkpoint losses are evaluated at the same restored weights; run signatures and completion checks prevent mixed or partial artifacts.
 
 These repairs do not eliminate the difference between a log-MSE objective and arithmetic conditional-mean variance. The report treats that as a modeling limitation, not as a solved implementation issue.
@@ -59,6 +64,14 @@ python scripts/evaluate_corrected_experiment.py \
 
 python -m pip install -r requirements-report.txt
 python reports/build_corrected_report.py
+
+# Additive follow-up: preserve the original corrected-v1 directory.
+python scripts/run_additive_residual.py \
+  --source runs/corrected-v1 --out runs/additive-residual-v1
+python scripts/evaluate_additive_residual.py \
+  --source runs/corrected-v1 --out runs/additive-residual-v1 \
+  --destination reports/additive_results.json
+python reports/build_additive_report.py
 ```
 
 The raw price snapshot, VIX snapshot, complete predictions, gates, and training logs are **not bundled**. Supply appropriately sourced input snapshots; the aggregate artifact records the exact hashes used for this run. Providing different input bytes creates a different experiment. VIX is used only for ex-post gate diagnostics, not as a training feature.
@@ -70,6 +83,8 @@ Full training is not a lightweight test. The runner uses separate model processe
 MSE and QLIKE are computed from identical daily targets. QLIKE is `mean(log(h) + y/h)`, with a fixed `1e-12` numerical floor; lower is better, and values can be negative.
 
 Paired stationary-bootstrap intervals quantify temporal uncertainty in candidate-minus-GARCH loss differences: mean block length 21, 2,000 replications, 95% pointwise percentile intervals, with block-length sensitivity. These are not multiple-comparison-adjusted intervals or measures of training-seed uncertainty.
+
+The additive control is trained on affine-standardized signed residuals, not log ratios. Its raw QLIKE is undefined because of nonpositive forecasts; raw MSE remains reportable. The primary clipped output uses the original `1e-12` floor, with floor sensitivities disclosed rather than selected for favorable test performance.
 
 Calendar diagnostics, level calibration, positive-forecast checks, and gate/VIX summaries accompany the aggregate scores. Gate correlations remain descriptive, not causal explanations or signals.
 

@@ -1,5 +1,6 @@
 """Optional deterministic CPU integration tests: RUN_TF_TESTS=1 python -m unittest discover -s tests."""
 import os
+from dataclasses import replace
 from pathlib import Path
 import tempfile
 import unittest
@@ -42,6 +43,19 @@ class TrainingTests(unittest.TestCase):
         a,_=run_rolling_experiment(self.df,self.splits.iloc[:1],'lstm','pure',self.cfg)
         b,_=run_rolling_experiment(self.df,self.splits.iloc[:1],'lstm','pure',self.cfg)
         np.testing.assert_array_equal(a.y_pred_var,b.y_pred_var)
+
+    def test_additive_target_stays_signed_through_training(self):
+        frame = self.df.copy()
+        frame['garch_cond_var'] = 0.01
+        frame['residual_var'] = frame.sq_return-frame.garch_cond_var
+        config = replace(self.cfg, target_transform='standardize')
+        predictions, logs = run_rolling_experiment(
+            frame, self.splits.iloc[:1], 'lstm', 'hybrid_residual', config,
+            target_col='residual_var', output_activation='linear')
+        self.assertTrue((predictions.y_true_var < 0).all())
+        self.assertTrue((predictions.y_pred_var < 0).all())
+        self.assertTrue(logs.target_transform.eq('standardize').all())
+        self.assertTrue(logs.output_activation_used.eq('linear').all())
 
     def test_incomplete_checkpoint_is_retrained(self):
         with tempfile.TemporaryDirectory() as d:

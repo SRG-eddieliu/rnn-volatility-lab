@@ -13,7 +13,15 @@ Corrected historical experiment: September 24, 2026.
 - Neural seeds are set before model construction. CPU integration tests cover LSTM and GRU, deterministic initialization, best-checkpoint train/validation evaluation, and retraining an incomplete checkpoint.
 - Bootstrap tests cover constant paired differences, seed repeatability, expected shape, and invalid inputs. The training supervisor and evaluator check current source hashes against preparation; a regression test rejects changed source before continuing.
 
-The complete test suite contains 19 tests, including three TensorFlow integration tests enabled with `RUN_TF_TESTS=1`. All were run successfully in the recorded environment.
+The complete test suite contains 27 tests, including four TensorFlow integration tests enabled with `RUN_TF_TESTS=1`. All were run successfully in the recorded environment. Additive-specific checks cover signed targets through training, zero-correction fallback, the residual-MSE identity, explicit clipping, undefined raw QLIKE, and float32 CSV round-trip reconstruction.
+
+## Additive Follow-up
+
+The original signed additive-residual LSTM has now been retrained on the same 178 folds, using the unchanged corrected-v1 feature frame and benchmark forecasts. The code, configuration, input hashes, exact date/target coverage, and training counts are checked. See the [follow-up plan](additive-residual-plan.md), [results](../reports/additive_residual_report.md), and [aggregate evidence](../reports/additive_results.json).
+
+Observed MSE falls by 5.45% before clipping and 5.48% with the original fixed `1e-12` floor. However, 60 raw forecasts are nonpositive; clipped QLIKE is approximately 457,801 versus -8.4613 for GARCH. The paired 95% temporal interval for clipped MSE minus GARCH MSE is approximately `[-2.47306e-8, +3.38485e-11]`, which includes zero. Share the observed improvement with these caveats, not as a robust superiority or production-readiness claim.
+
+TensorFlow's residual predictions are float32. The evaluator restores that dtype when reading their short CSV representation and verifies the float64 reconstructed forecasts exactly to numerical tolerance; the source files themselves are unchanged. This is a serialization audit, not a new model choice or a rescore with tuned predictions.
 
 ## Corrected Experimental Design
 
@@ -33,7 +41,7 @@ Raw snapshots and prediction CSVs are retained locally and not distributed in th
 
 ## Remaining Research Limitations
 
-1. **Objective alignment:** log-MSE and log-ratio MSE do not generally target arithmetic conditional-mean variance after exponentiation. Positive reconstruction is not a calibration guarantee. A direct original-scale objective remains a follow-up experiment.
+1. **Objective alignment and positivity:** log-MSE and log-ratio MSE do not generally target arithmetic conditional-mean variance after exponentiation. The additive follow-up restores an original-scale MSE-aligned objective but does not guarantee positive variance. A positive-output model trained directly under an original-scale objective remains untested.
 2. **Seed and model-selection uncertainty:** the primary run uses one training seed schedule. Temporal loss bootstrap intervals are conditional on those trained forecasts and are not multiple-comparison adjusted.
 3. **Historical reuse:** the cached dataset was inspected in previous research. This is chronological walk-forward testing, not an untouched prospective final holdout.
 4. **Data and proxy scope:** one equity index and a noisy squared-return proxy. The snapshot was not independently reconciled against another vendor, and corporate data revisions were not reconstructed point in time.

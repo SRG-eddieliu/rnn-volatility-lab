@@ -2,13 +2,15 @@
 
 **Eddie Liu** | Corrected-v1 | September 24, 2026
 
+This is the preserved nine-specification experiment. The later [additive-residual follow-up](additive_residual_report.md) restores the original signed-residual MSE objective on identical dates; it must be read separately from the log-ratio results below.
+
 This is a fresh historical rerun after implementation repairs and a revised common-sample design. It is not an untouched prospective holdout, a multiple-seed study, or evidence of trading alpha.
 
 ## Reports and Evidence
 
 - [Research study (8 pages)](volatility-research.pdf)
 - [Technical appendix (5 pages)](volatility-diagnostics.pdf)
-- [Combined report (13 pages)](volatility-research-with-appendix.pdf)
+- [Combined report with the additive follow-up (17 pages)](volatility-research-with-appendix.pdf)
 - [Aggregate results, intervals, and source hashes](corrected_results.json)
 - [Experiment plan](../docs/corrected-experiment-plan.md)
 - [Validation scope and limitations](../docs/validation-status.md)
