@@ -2,7 +2,7 @@
 
 A controlled study of one-day S&P 500 variance forecasts using GARCH, LSTM, GRU, and residual-learning models.
 
-**[Read the research report](reports/volatility-final-report.pdf)** | **[Explore the code](src)** | **[Run the demo](#quick-offline-demo)**
+**[Research brief (2 pages)](reports/volatility-research-brief.pdf)** | **[Full report (6 pages)](reports/volatility-final-report.pdf)** | **[Code](src)** | **[Demo](#quick-offline-demo)**
 
 3,738 common test dates, 178 expanding-window folds, and explicit checks of error, positivity, calibration, and temporal uncertainty. This is a single-seed historical study, not a trading-alpha claim or production model.
 
@@ -28,7 +28,7 @@ aggregate evidence, without rerunning or modifying the historical experiment.
 
 ## Research and Results
 
-The [six-page report](reports/volatility-final-report.pdf) presents the complete methods, results, uncertainty, and reproducibility details in one document. The study compares nine benchmark/log-target specifications plus one additive-residual LSTM with raw and floored outputs on **3,738 identical dates**, February 5, 2010 to December 11, 2024.
+Start with the [two-page research brief](reports/volatility-research-brief.pdf) for the question, approach, and key findings. The [six-page report](reports/volatility-final-report.pdf) preserves the complete methods, results, uncertainty, and reproducibility details. The study compares nine benchmark/log-target specifications plus one additive-residual LSTM with raw and floored outputs on **3,738 identical dates**, February 5, 2010 to December 11, 2024.
 
 Results are reported whether or not a neural model improves on a simple baseline. The analysis distinguishes implementation correctness, positivity, calibration, and loss-based performance. No strategy P&L or Sharpe-ratio improvement is claimed.
 
@@ -82,6 +82,7 @@ python scripts/evaluate_additive_residual.py \
 python -m pip install -r requirements-report.txt
 python reports/build_readme_figure.py
 python reports/build_final_report.py
+python reports/build_research_brief.py
 ```
 
 The raw price snapshot, VIX snapshot, complete predictions, gates, and training logs are **not bundled**. Supply appropriately sourced input snapshots; the aggregate artifact records the exact hashes used for this run. Providing different input bytes creates a different experiment. VIX is used only for ex-post gate diagnostics, not as a training feature.
@@ -108,6 +109,7 @@ Calendar diagnostics, level calibration, positive-forecast checks, and gate/VIX 
 | [scripts](scripts) | Preparation, training, and evaluation workflow |
 | [tests](tests) | Regression, bootstrap, and optional CPU integration checks |
 | [reports/build_final_report.py](reports/build_final_report.py) | Standalone research report from the public aggregate evidence |
+| [reports/build_research_brief.py](reports/build_research_brief.py) | Two-page high-level brief; leaves the full report unchanged |
 | [docs/validation-status.md](docs/validation-status.md) | Completed checks and unresolved research limits |
 
 ### Supporting Evidence
