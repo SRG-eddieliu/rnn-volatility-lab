@@ -4,6 +4,26 @@ A controlled study of one-day S&P 500 variance forecasts using GARCH, LSTM, GRU,
 
 **Status:** corrected historical walk-forward experiments, including the restored additive-residual LSTM control. The original implementation defects have been repaired and regression-tested. This is a single-seed research prototype, not a trading-alpha claim or production model.
 
+[![Forecast regression tests](https://github.com/SRG-eddieliu/rnn-volatility-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/SRG-eddieliu/rnn-volatility-lab/actions/workflows/tests.yml)
+
+![Common-date MSE and paired uncertainty: additive MSE improves but intervals include zero; positivity and QLIKE remain problematic](reports/figures/additive-summary.png)
+
+## Quick Offline Demo
+
+```bash
+python -m pip install -r requirements-test.txt
+python scripts/smoke_demo.py
+python -m unittest discover -s tests -v
+```
+
+No account, API key, market download, or TensorFlow is needed. The demo generates
+synthetic returns, fits a small rolling GARCH baseline, checks forecast timing,
+and evaluates GARCH/EWMA on common dates. **It does not reproduce the historical
+results above or train an LSTM.** Full research reproduction is documented below.
+CI runs the lightweight suite on pushes; manual workflow runs also test TensorFlow.
+The figure is rebuilt with `python reports/build_readme_figure.py` from committed
+aggregate evidence, without rerunning or modifying the historical experiment.
+
 ## Research and Results
 
 - [Latest: additive residual follow-up (4 pages)](reports/volatility-additive-residual.pdf)
