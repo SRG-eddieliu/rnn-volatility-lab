@@ -1,10 +1,12 @@
 # RNN Volatility Lab
 
-A study of equity-index volatility forecasts, plus a separate retrospective diagnostic of stock portfolio volatility tilts.
+A study of equity-index volatility forecasts, plus a separately retrained stock-level GARCH/LSTM model and dynamic portfolio-weighting experiment.
 
 **[Research brief (2 pages)](reports/volatility-research-brief.pdf)** | **[Full report (8 pages)](reports/volatility-complete-report.pdf)** | **[Code](src)** | **[Demo](#quick-offline-demo)**
 
-The index forecast study uses 3,738 common test dates and 178 expanding-window folds. The portfolio diagnostic uses a different, legacy stock-model panel over 2,390 return dates. These are separate experiments, not one validated prediction-to-trading pipeline.
+**Latest stock retraining:** all 503 stock columns processed, with 1,968 saved LSTM fits across 502 stocks. The hybrid improves individual-stock MSE for 493 stocks but fails aggregate forecast robustness because of extreme ratio predictions. Monthly net Sharpe is 1.119 for the cap base, 1.101 for matched GARCH, and 1.115 for GARCH/LSTM; paired intervals do not resolve a hybrid advantage. [Results and failure diagnosis](docs/stock-retraining-findings.md).
+
+The unchanged index study uses 3,738 common test dates and 178 expanding-window folds. The separate stock portfolio experiment uses 2,390 return dates. The index additive-residual model and stock multiplicative-ratio model must not be interpreted as one prediction-to-trading pipeline.
 
 [![Forecast regression tests](https://github.com/SRG-eddieliu/rnn-volatility-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/SRG-eddieliu/rnn-volatility-lab/actions/workflows/tests.yml)
 
@@ -28,7 +30,7 @@ aggregate evidence, without rerunning or modifying the historical experiment.
 
 ## Research and Results
 
-Start with the [two-page research brief](reports/volatility-research-brief.pdf): page one covers index forecasting; page two covers the separate stock portfolio diagnostic. The [eight-page report](reports/volatility-complete-report.pdf) includes both studies. The [six-page forecast-only report](reports/volatility-final-report.pdf) is preserved unchanged.
+Start with the [two-page research brief](reports/volatility-research-brief.pdf): page one covers index forecasting; page two covers the newly retrained stock portfolio experiment. The [eight-page report](reports/volatility-complete-report.pdf) includes both studies. The [six-page forecast-only report](reports/volatility-final-report.pdf) is preserved unchanged. This section describes the index experiment only.
 
 The forecast study compares nine benchmark/log-target specifications plus one additive-residual LSTM with raw and floored outputs on **3,738 identical dates**, February 5, 2010 to December 11, 2024.
 
@@ -40,24 +42,31 @@ GARCH beats all six log-target/log-ratio neural candidates on MSE and QLIKE. The
 
 ## Portfolio Construction and Economic Value
 
-The legacy stock model uses **GARCH volatility multiplied by an LSTM ratio correction**, not the index additive-residual model above. Targets multiply a base allocation by `clip(trailing_vol / saved_forecast, 0.5, 1.5)` and renormalize. The repaired engine uses next-close execution, simple stock returns, drifting weights, actual traded dollars, self-financing costs, and real trading-session rebalance dates.
+The stock model uses **GARCH volatility multiplied by an LSTM ratio correction**, not the index additive-residual model above. Both GARCH and the LSTM were freshly fitted from returns; old cached hybrid predictions were not reused. Each neural fit uses strictly prior training labels/scalers, fixed seeds and saved checkpoints. One stock has insufficient history for a neural fit.
+
+Target weights multiply a base allocation by `clip(trailing_vol / forecast, 0.5, 1.5)` and renormalize. The engine uses next-close execution, simple stock returns, drifting weights, actual traded dollars, self-financing costs, and real trading-session rebalance dates. Matched GARCH uses the same finite raw model-coverage dates as the hybrid; unavailable/nonpositive forecasts receive neutral tilts.
 
 **Primary comparison: monthly, 10 bps per dollar bought/sold, 2015-07-06 to 2024-12-31.**
 
 | Same-universe diagnostic | Net Sharpe | Maximum drawdown |
 | --- | ---: | ---: |
 | Snapshot-cap base | 1.119 | -33.25% |
-| Snapshot-cap + volatility tilt | 1.115 | -32.51% |
+| Snapshot-cap + matched GARCH | 1.101 | -33.15% |
+| Snapshot-cap + GARCH/LSTM | 1.115 | -32.48% |
 | Equal-weight base | 0.738 | -38.34% |
-| Equal-weight + volatility tilt | 0.728 | -38.18% |
+| Equal-weight + matched GARCH | 0.729 | -37.79% |
+| Equal-weight + GARCH/LSTM | 0.729 | -38.15% |
 
-The primary Sharpe difference is **-0.0038**, with a paired 95% temporal interval of **[-0.0289, +0.0194]**. Drawdown improves modestly in this sample, but there is no resolved incremental Sharpe benefit. The small gross Sharpe advantage disappears at the primary cost assumption. All frequency/cost sensitivities are reported, not just the highest-performing setting.
+The cap hybrid's Sharpe difference versus matched GARCH is **+0.0139**, paired 95% temporal interval **[-0.0089, +0.0335]**. Versus the untilted cap base, it is **-0.0043**, interval **[-0.0302, +0.0191]**. Both equal-weight intervals also include zero. Drawdown improves modestly versus the cap base, but there is no resolved incremental Sharpe benefit. All predefined frequency/cost sensitivities and unrestricted GARCH comparisons are retained.
 
-**Retrospective diagnostic, not point-in-time alpha:** the source repeats later market caps across history and uses a later survivor list. Equal weighting does not fix survivor bias. Cached stock forecasts were not retrained or independently reproduced; 76 nonpositive forecasts receive neutral tilts rather than being interpreted as low risk. The S&P 500 price index is context, not a matched total-return comparator. Sharpe uses an assumed constant daily risk-free return of 0.0001. These figures do not validate achievable returns or isolate an LSTM contribution.
+**Forecast failure is material:** common-date, date-equal MSE against trailing 21-day volatility is `1.2789e-4` for GARCH, `1.9130e-1` for the raw hybrid, and `3.0968e-6` for lagged realized-volatility persistence. AMCR accounts for 99.96% of hybrid MSE because near-zero GARCH denominators create extreme ratio targets. There are 475 nonpositive hybrid forecasts. Independent checkpoint replay reproduces the inspected failures; no stocks were removed or seeds retuned. Better median-stock MSE does not offset this aggregate failure. Clipping allocation tilts does not repair the forecasting model.
 
-- [Portfolio diagnostic (2 pages)](reports/volatility-portfolio-overlay.pdf)
-- [Fixed protocol, timing, costs, and data limits](docs/portfolio-overlay-protocol.md)
-- [All aggregate results, sensitivities, and source hashes](reports/portfolio_overlay_results.json)
+**Retrospective diagnostic, not point-in-time alpha:** later market caps are repeated across history and the universe is a later survivor list. Equal weighting does not fix survivor bias. The overlapping trailing-volatility target is not purely future realized risk; the persistence control matters. Sharpe assumes constant daily risk-free return 0.0001. Retraining makes model provenance auditable but does not validate achievable returns, production robustness or a causal LSTM contribution.
+
+- [Retraining report (2 pages)](reports/stock-retraining-report.pdf) and [failure diagnosis](docs/stock-retraining-findings.md)
+- [Fixed training protocol](docs/stock-overlay-retraining.md) and [evaluation addendum](docs/stock-overlay-evaluation.md)
+- [Aggregate results, all sensitivities and source hashes](reports/stock_retraining_results.json)
+- [Independent model replay and six daily portfolio reconciliations](reports/stock_retraining_verification.json)
 - [Portfolio engine](src/evaluation/portfolio.py) and [regression tests](tests/test_portfolio.py)
 
 ## Forecast Implementation
@@ -108,13 +117,32 @@ python reports/build_readme_figure.py
 python reports/build_final_report.py
 python reports/build_portfolio_report.py
 python reports/build_research_brief.py
+python reports/build_retrained_report.py
 ```
 
 The raw price snapshot, VIX snapshot, complete predictions, gates, and training logs are **not bundled**. Supply appropriately sourced input snapshots; the aggregate artifact records the exact hashes used for this run. Providing different input bytes creates a different experiment. VIX is used only for ex-post gate diagnostics, not as a training feature.
 
 Full training is not a lightweight test. The runner uses separate model processes, bounded worker counts, checkpointed outputs, and run signatures. Reuse an output directory only with matching inputs/code/configuration. Use a separate directory for smoke tests or alternative seeds.
 
-### Portfolio Diagnostic
+### Stock Retraining and Portfolio Evaluation
+
+The supplied return and cap snapshots are described in the [training protocol](docs/stock-overlay-retraining.md). No vendor data or saved per-stock weights/forecasts are distributed. The completed run took approximately 104 minutes with eight single-thread CPU workers in the recorded environment; other machines may differ. Review the documented retrospective source limitations before running.
+
+```bash
+python scripts/retrain_stock_overlay.py \
+  --source /path/to/legacy-portfolio-inputs \
+  --out runs/stock-retrain-v1 --prepare
+python scripts/retrain_stock_overlay.py --out runs/stock-retrain-v1 --workers 8
+python scripts/evaluate_stock_retraining.py \
+  --source /path/to/legacy-portfolio-inputs --run runs/stock-retrain-v1
+python scripts/verify_stock_retraining.py \
+  --source /path/to/legacy-portfolio-inputs --run runs/stock-retrain-v1
+python reports/build_retrained_report.py
+```
+
+For an interrupted run, omit `--prepare` and keep the same signed code/configuration/inputs. Use a new output directory for a different experiment. The report builder verifies source-code hashes against the committed aggregate evidence and preserves the index report. Run it **last** after other report builders: the earlier builders otherwise restore the cached-forecast portfolio presentation.
+
+### Earlier Cached-Forecast Diagnostic
 
 The portfolio runner requires the three local CSV inputs described in the protocol; it neither downloads data nor trains a stock model. Review the source limitations before acknowledging them. Keep daily outputs in the ignored `runs/` directory, not in published reports.
 
@@ -125,11 +153,14 @@ python scripts/evaluate_portfolio_overlay.py \
   --acknowledge-retrospective-data
 python reports/build_portfolio_report.py
 python reports/build_research_brief.py
+python reports/build_retrained_report.py
 ```
 
-The aggregate results include a replay of the old notebook scores for provenance only. Those replay rows deliberately retain old accounting defects and are not the repaired result. Historical vendor inputs and per-stock forecasts are not distributed.
+The [earlier aggregate results](reports/portfolio_overlay_results.json) and [accounting protocol](docs/portfolio-overlay-protocol.md) are retained for provenance, not as the latest model scores. They include an explicitly labeled replay of old notebook scores with old accounting defects. Historical vendor inputs and per-stock forecasts are not distributed.
 
 ## Evaluation
+
+The following loss/target details apply to the index experiment. The stock experiment's different trailing-volatility target, positive-forecast subset, common coverage, persistence control and portfolio intervals are specified in its [evaluation addendum](docs/stock-overlay-evaluation.md).
 
 MSE and QLIKE are computed from identical daily targets. QLIKE is `mean(log(h) + y/h)`, with a fixed `1e-12` numerical floor; lower is better, and values can be negative.
 
@@ -145,6 +176,7 @@ Calendar diagnostics, level calibration, positive-forecast checks, and gate/VIX 
 | --- | --- |
 | [src/data](src/data) | Return features and chronological splits |
 | [src/models](src/models) | GARCH recursion, neural fitting, positive reconstruction |
+| [src/models/stock_overlay.py](src/models/stock_overlay.py) | Separate stock rolling GARCH and expanding-history ratio LSTM |
 | [src/losses](src/losses) | Original-scale forecast losses |
 | [src/evaluation/portfolio.py](src/evaluation/portfolio.py) | Self-financing long-only overlay accounting, timing, drift, and metrics |
 | [scripts](scripts) | Preparation, training, and evaluation workflow |
@@ -152,6 +184,7 @@ Calendar diagnostics, level calibration, positive-forecast checks, and gate/VIX 
 | [reports/build_final_report.py](reports/build_final_report.py) | Standalone research report from the public aggregate evidence |
 | [reports/build_portfolio_report.py](reports/build_portfolio_report.py) | Portfolio diagnostic and combined report; preserves the forecast-only PDF |
 | [reports/build_research_brief.py](reports/build_research_brief.py) | Two-page brief with separate forecast and portfolio panels |
+| [reports/build_retrained_report.py](reports/build_retrained_report.py) | Latest stock report, complete report and brief; run last |
 | [docs/validation-status.md](docs/validation-status.md) | Completed checks and unresolved research limits |
 
 ### Supporting Evidence

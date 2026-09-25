@@ -1,0 +1,138 @@
+{
+  "model_replay": {
+    "scope": "3 fixed stocks first/last blocks plus all blocks for 2 observed failure cases; NumPy LSTM/scaler replay including extrema",
+    "garch_refits_checked": 15,
+    "neural_prediction_spot_checks": [
+      {
+        "ticker": "AAPL",
+        "fit_id": 0,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 1.0088196528146298e-09,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "AAPL",
+        "fit_id": 3,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 5.451329165850893e-09,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "ABBV",
+        "fit_id": 0,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 1.1852521047961417e-09,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "ABBV",
+        "fit_id": 3,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 2.811283095205397e-09,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "ABNB",
+        "fit_id": 0,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 3.167476586574125e-09,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "ABNB",
+        "fit_id": 1,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 3.212894020276913e-09,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "AMCR",
+        "fit_id": 0,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 1.0634778064400052e-05,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "AMCR",
+        "fit_id": 1,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 1.0004068816016343e-05,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "AMCR",
+        "fit_id": 2,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 2.21738749885958e-05,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "AMCR",
+        "fit_id": 3,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 2.293873060033036e-05,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "TTWO",
+        "fit_id": 0,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 2.8747289196329184e-07,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "TTWO",
+        "fit_id": 1,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 3.5039178981899344e-07,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "TTWO",
+        "fit_id": 2,
+        "predictions_checked": 5,
+        "max_absolute_sigma_error": 3.836477943108818e-07,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      },
+      {
+        "ticker": "TTWO",
+        "fit_id": 3,
+        "predictions_checked": 4,
+        "max_absolute_sigma_error": 6.436147752530985e-07,
+        "scalers_recomputed_from_strictly_prior_labels": true
+      }
+    ]
+  },
+  "independent_portfolio_accounting": [
+    {
+      "model": "cap_base",
+      "dates": 2390,
+      "max_daily_return_disagreement": 5.43835809718729e-16
+    },
+    {
+      "model": "cap_garch",
+      "dates": 2390,
+      "max_daily_return_disagreement": 5.408000436357696e-16
+    },
+    {
+      "model": "cap_hybrid",
+      "dates": 2390,
+      "max_daily_return_disagreement": 5.412337245047638e-16
+    },
+    {
+      "model": "equal_base",
+      "dates": 2390,
+      "max_daily_return_disagreement": 5.414505649392609e-16
+    },
+    {
+      "model": "equal_garch",
+      "dates": 2390,
+      "max_daily_return_disagreement": 5.35162192338845e-16
+    },
+    {
+      "model": "equal_hybrid",
+      "dates": 2390,
+      "max_daily_return_disagreement": 5.273559366969494e-16
+    }
+  ]
+}

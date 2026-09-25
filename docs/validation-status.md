@@ -1,6 +1,42 @@
 # Validation Status
 
-## Portfolio Extension - September 25, 2026
+## Completed Stock Retraining - September 25, 2026
+
+All 503 stock columns were processed without unhandled worker failures. The run
+saved 1,968 LSTM fits across 502 stocks; one has insufficient neural training
+history. Training-only scaler statistics, prior-label cutoffs, input/code hashes
+and all 1,968 checkpoint files were verified. GARCH was freshly refitted from
+returns, and old cached hybrid forecasts were not reused.
+
+All **53 tests pass including TensorFlow**, with no skipped tests. New coverage
+checks stock timing, chronological scaling, forecast coverage, future-data
+invariance, evaluation loss alignment and independent portfolio accounting.
+The older TensorFlow test setup now sets thread environment defaults before
+initialization so both integration suites can run together; the index training
+implementation, aggregate scores and six-page report are unchanged.
+
+Independent NumPy recurrence replay checked 69 predictions across 14 fit blocks,
+including AMCR/TTWO failure extrema, with scalers reconstructed from prior labels.
+Fifteen fresh GARCH fits were checked. Six primary portfolio return paths were
+recomputed with dollar holdings and bisection transaction-cost accounting over
+2,390 dates each; maximum daily-return disagreement is below 6e-16. These are
+implementation checks, not independent certification of the source data.
+
+**The retrained model is not robust:** 475 raw outputs are nonpositive, while
+AMCR contributes 99.96% of aggregate hybrid MSE through extreme ratio targets
+associated with near-zero GARCH denominators. Although 493/502 stock-level MSEs
+improve, aggregate MSE is worse and the persistence control outperforms both.
+Monthly cap-base/GARCH/hybrid Sharpes are 1.1189/1.1007/1.1146; primary paired
+hybrid-minus-comparator intervals include zero. Later survivor stocks and cap
+snapshots remain a source of bias, so no point-in-time alpha claim is justified.
+
+See [findings](stock-retraining-findings.md),
+[aggregate evidence](../reports/stock_retraining_results.json), and
+[independent checks](../reports/stock_retraining_verification.json).
+The latest brief/report use this completed run; the notes below retain the
+chronology of earlier work and must not be read as the latest stock-model status.
+
+## Earlier Cached-Forecast Portfolio Extension - September 25, 2026
 
 The separate stock portfolio accounting diagnostic is now implemented and rerun.
 Fourteen new unit tests cover weighted simple returns, weight drift, execution
@@ -74,7 +110,7 @@ Raw snapshots and prediction CSVs are retained locally and not distributed in th
 3. **Historical reuse:** the cached dataset was inspected in previous research. This is chronological walk-forward testing, not an untouched prospective final holdout.
 4. **Data and proxy scope:** one equity index and a noisy squared-return proxy. The snapshot was not independently reconciled against another vendor, and corporate data revisions were not reconstructed point in time.
 5. **Gate interpretation:** same-date VIX is ex-post context; pooled gate averages across separate model fits do not establish causality, memory horizon, or alpha.
-6. **Economic and operational validation:** no strategy, transaction costs, execution model, portfolio P&L, production monitoring, or independent model-governance sign-off is represented.
+6. **Economic and operational validation of the index model:** no portfolio P&L or execution model is established for the index forecasts. The separate stock model now has cost-aware retrospective accounting, but its biased sources do not validate achievable returns. Neither study has production monitoring or independent model-governance sign-off.
 
 ## Historical Artifacts
 

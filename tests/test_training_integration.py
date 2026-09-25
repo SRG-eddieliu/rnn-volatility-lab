@@ -5,6 +5,10 @@ from pathlib import Path
 import tempfile
 import unittest
 
+# Configure before runtime initialization; other integration tests share TensorFlow.
+os.environ.setdefault('TF_NUM_INTRAOP_THREADS', '2')
+os.environ.setdefault('TF_NUM_INTEROP_THREADS', '1')
+
 import numpy as np
 import pandas as pd
 
@@ -17,8 +21,6 @@ class TrainingTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         import tensorflow as tf
-        tf.config.threading.set_intra_op_parallelism_threads(2)
-        tf.config.threading.set_inter_op_parallelism_threads(1)
         tf.config.experimental.enable_op_determinism()
         tf.get_logger().setLevel('ERROR')
         rng=np.random.default_rng(5)
