@@ -1,0 +1,1699 @@
+{
+  "study": "legacy-equity-volatility-overlay-accounting-diagnostic",
+  "status": "Retrospective diagnostic; not point-in-time alpha evidence",
+  "data": {
+    "forecast_rows": 2392,
+    "assets": 503,
+    "start": "2015-07-06",
+    "end": "2024-12-31",
+    "observations": 2390,
+    "cap_snapshot_unique_rows": 1,
+    "forecast_missing": 37753,
+    "forecast_nonpositive": 76,
+    "forecast_max": 213.4234302906459,
+    "historical_return_infinities": 0,
+    "evaluation_return_infinities": 0,
+    "eligible_asset_days": 1167571,
+    "neutral_fallback_asset_days": 4616,
+    "nonpositive_forecast_asset_days": 76,
+    "missing_forecast_asset_days": 4540,
+    "lower_bound_asset_days": 26807,
+    "upper_bound_asset_days": 20901,
+    "min_eligible_assets": 470,
+    "max_eligible_assets": 502,
+    "equal_weight_eligibility": {
+      "eligible_asset_days": 1169963,
+      "neutral_fallback_asset_days": 4616,
+      "nonpositive_forecast_asset_days": 76,
+      "missing_forecast_asset_days": 4540,
+      "lower_bound_asset_days": 26861,
+      "upper_bound_asset_days": 20939,
+      "min_eligible_assets": 471,
+      "max_eligible_assets": 503
+    }
+  },
+  "configuration": {
+    "primary_frequency": "monthly",
+    "primary_cost_bps": 10,
+    "primary_execution_lag": 1,
+    "trailing_vol_window": 21,
+    "tilt_bounds": [
+      0.5,
+      1.5
+    ],
+    "rf_daily_assumption": 0.0001,
+    "cash_daily_return": 0.0,
+    "annualization": 252,
+    "terminal_liquidation": false,
+    "forecast_retraining_performed": false
+  },
+  "metrics": [
+    {
+      "n": 2390,
+      "cagr": 0.26024851130167687,
+      "annualized_arithmetic_return": 0.2520474639010892,
+      "annualized_volatility": 0.20274167348772068,
+      "sharpe": 1.1188990403338488,
+      "max_drawdown": -0.332542719377547,
+      "terminal_wealth": 8.968902267372236,
+      "id": "snapshot_cap_monthly_10bps_lag1",
+      "model": "snapshot_cap",
+      "frequency": "monthly",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.2431951436780204,
+      "annualized_traded_notional": 0.7257653973582231,
+      "sum_daily_cost_fractions": 0.006883251189230277,
+      "rebalances": 114
+    },
+    {
+      "n": 2390,
+      "cagr": 0.25954704508865184,
+      "annualized_arithmetic_return": 0.25153949711708723,
+      "annualized_volatility": 0.20298391125344759,
+      "sharpe": 1.1150612662817283,
+      "max_drawdown": -0.32510722480001153,
+      "terminal_wealth": 8.921667477743135,
+      "id": "hybrid_cap_monthly_10bps_lag1",
+      "model": "hybrid_cap",
+      "frequency": "monthly",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.2392090366364685,
+      "annualized_traded_notional": 2.285049028682138,
+      "sum_daily_cost_fractions": 0.021671695152977177,
+      "rebalances": 114
+    },
+    {
+      "n": 2390,
+      "cagr": 0.15544359125606136,
+      "annualized_arithmetic_return": 0.161749547321922,
+      "annualized_volatility": 0.1851473424452486,
+      "sharpe": 0.7375182679832533,
+      "max_drawdown": -0.38335811638765016,
+      "terminal_wealth": 3.9365619910776375,
+      "id": "equal_weight_monthly_10bps_lag1",
+      "model": "equal_weight",
+      "frequency": "monthly",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 0.8736260817232863,
+      "annualized_traded_notional": 0.7424073972870784,
+      "sum_daily_cost_fractions": 0.007041086029825894,
+      "rebalances": 114
+    },
+    {
+      "n": 2390,
+      "cagr": 0.15327378759051755,
+      "annualized_arithmetic_return": 0.15983243231478209,
+      "annualized_volatility": 0.18496420346324985,
+      "sharpe": 0.727883719086931,
+      "max_drawdown": -0.3818081533607989,
+      "terminal_wealth": 3.8670069002828793,
+      "id": "hybrid_equal_monthly_10bps_lag1",
+      "model": "hybrid_equal",
+      "frequency": "monthly",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 0.8641262975326947,
+      "annualized_traded_notional": 2.3154219899116084,
+      "sum_daily_cost_fractions": 0.021959756174162015,
+      "rebalances": 114
+    },
+    {
+      "n": 2390,
+      "cagr": 0.2597096432019324,
+      "annualized_arithmetic_return": 0.251871908303654,
+      "annualized_volatility": 0.2039815022020548,
+      "sharpe": 1.111237567410025,
+      "max_drawdown": -0.33333076273103834,
+      "terminal_wealth": 8.932596525920895,
+      "id": "snapshot_cap_daily_10bps_lag1",
+      "model": "snapshot_cap",
+      "frequency": "daily",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.2347781812792082,
+      "annualized_traded_notional": 2.765751052072372,
+      "sum_daily_cost_fractions": 0.026230734184336857,
+      "rebalances": 2390
+    },
+    {
+      "n": 2390,
+      "cagr": 0.26203819514512056,
+      "annualized_arithmetic_return": 0.25363744221060136,
+      "annualized_volatility": 0.20358059580849816,
+      "sharpe": 1.1220983085513967,
+      "max_drawdown": -0.33304897667614897,
+      "terminal_wealth": 9.09042972874114,
+      "id": "snapshot_cap_weekly_10bps_lag1",
+      "model": "snapshot_cap",
+      "frequency": "weekly",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.2458822079938803,
+      "annualized_traded_notional": 1.3825454336914682,
+      "sum_daily_cost_fractions": 0.013112236454454473,
+      "rebalances": 497
+    },
+    {
+      "n": 2390,
+      "cagr": 0.28033371000386925,
+      "annualized_arithmetic_return": 0.268614204045538,
+      "annualized_volatility": 0.20632127538812225,
+      "sharpe": 1.1797823738130653,
+      "max_drawdown": -0.3304526361015211,
+      "terminal_wealth": 10.41997482001663,
+      "id": "snapshot_cap_yearly_10bps_lag1",
+      "model": "snapshot_cap",
+      "frequency": "yearly",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.30192198327697,
+      "annualized_traded_notional": 0.3114699710823639,
+      "sum_daily_cost_fractions": 0.0029540207574874078,
+      "rebalances": 10
+    },
+    {
+      "n": 2390,
+      "cagr": 0.21554310486696313,
+      "annualized_arithmetic_return": 0.21612739893421892,
+      "annualized_volatility": 0.20383362538620292,
+      "sharpe": 0.9366825447590867,
+      "max_drawdown": -0.34201334098163383,
+      "terminal_wealth": 6.367557832027446,
+      "id": "hybrid_cap_daily_10bps_lag1",
+      "model": "hybrid_cap",
+      "frequency": "daily",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.0603127846287532,
+      "annualized_traded_notional": 37.48884188362391,
+      "sum_daily_cost_fractions": 0.3555489369121484,
+      "rebalances": 2390
+    },
+    {
+      "n": 2390,
+      "cagr": 0.25195094313130045,
+      "annualized_arithmetic_return": 0.24559275589845625,
+      "annualized_volatility": 0.20352504777463776,
+      "sharpe": 1.0828777996037915,
+      "max_drawdown": -0.3319340613161067,
+      "terminal_wealth": 8.424234662144723,
+      "id": "hybrid_cap_weekly_10bps_lag1",
+      "model": "hybrid_cap",
+      "frequency": "weekly",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.2066954833510215,
+      "annualized_traded_notional": 8.82634495046169,
+      "sum_daily_cost_fractions": 0.0837101763158854,
+      "rebalances": 497
+    },
+    {
+      "n": 2390,
+      "cagr": 0.27948495126156037,
+      "annualized_arithmetic_return": 0.2677043912495764,
+      "annualized_volatility": 0.20512694806476636,
+      "sharpe": 1.1822161521801056,
+      "max_drawdown": -0.33119294809864364,
+      "terminal_wealth": 10.354646105543804,
+      "id": "hybrid_cap_yearly_10bps_lag1",
+      "model": "hybrid_cap",
+      "frequency": "yearly",
+      "cost_bps": 10,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.305066905032156,
+      "annualized_traded_notional": 0.38057789454342733,
+      "sum_daily_cost_fractions": 0.0036094490792014655,
+      "rebalances": 10
+    },
+    {
+      "n": 2390,
+      "cagr": 0.26116357653404426,
+      "annualized_arithmetic_return": 0.2527737892181075,
+      "annualized_volatility": 0.20274107100466945,
+      "sharpe": 1.1224848921354773,
+      "max_drawdown": -0.3325094268328961,
+      "terminal_wealth": 9.030856441457683,
+      "id": "snapshot_cap_monthly_0bps_lag1",
+      "model": "snapshot_cap",
+      "frequency": "monthly",
+      "cost_bps": 0,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.2467813648487915,
+      "annualized_traded_notional": 0.7258984033842861,
+      "sum_daily_cost_fractions": 0.0,
+      "rebalances": 114
+    },
+    {
+      "n": 2390,
+      "cagr": 0.25887745280239105,
+      "annualized_arithmetic_return": 0.250958472208241,
+      "annualized_volatility": 0.2027438410161801,
+      "sharpe": 1.1135158092926938,
+      "max_drawdown": -0.3325926440980532,
+      "terminal_wealth": 8.876786713697257,
+      "id": "snapshot_cap_monthly_25bps_lag1",
+      "model": "snapshot_cap",
+      "frequency": "monthly",
+      "cost_bps": 25,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.237810583790869,
+      "annualized_traded_notional": 0.725566817572266,
+      "sum_daily_cost_fractions": 0.017203419583310953,
+      "rebalances": 114
+    },
+    {
+      "n": 2390,
+      "cagr": 0.2624287932371186,
+      "annualized_arithmetic_return": 0.25382677857744523,
+      "annualized_volatility": 0.20298417719627013,
+      "sharpe": 1.1263280800275417,
+      "max_drawdown": -0.32495311392865633,
+      "terminal_wealth": 9.11714807956361,
+      "id": "hybrid_cap_monthly_0bps_lag1",
+      "model": "hybrid_cap",
+      "frequency": "monthly",
+      "cost_bps": 0,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.2504756877281828,
+      "annualized_traded_notional": 2.285390698178424,
+      "sum_daily_cost_fractions": 0.0,
+      "rebalances": 114
+    },
+    {
+      "n": 2390,
+      "cagr": 0.2552371114623496,
+      "annualized_arithmetic_return": 0.2481098432749442,
+      "annualized_volatility": 0.20298815675153767,
+      "sharpe": 1.0981421125361082,
+      "max_drawdown": -0.32533835431149505,
+      "terminal_wealth": 8.636300536244223,
+      "id": "hybrid_cap_monthly_25bps_lag1",
+      "model": "hybrid_cap",
+      "frequency": "monthly",
+      "cost_bps": 25,
+      "execution_lag": 1,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.2222872863397474,
+      "annualized_traded_notional": 2.284542127248059,
+      "sum_daily_cost_fractions": 0.05416721908851985,
+      "rebalances": 114
+    },
+    {
+      "n": 2390,
+      "cagr": 0.26023477023451413,
+      "annualized_arithmetic_return": 0.252036302571153,
+      "annualized_volatility": 0.20274046573242813,
+      "sharpe": 1.1188506534779592,
+      "max_drawdown": -0.332542719377547,
+      "terminal_wealth": 8.967974838026795,
+      "id": "snapshot_cap_monthly_10bps_lag0",
+      "model": "snapshot_cap",
+      "frequency": "monthly",
+      "cost_bps": 10,
+      "execution_lag": 0,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.243147497272618,
+      "annualized_traded_notional": 0.7257500808107286,
+      "sum_daily_cost_fractions": 0.006883105925148847,
+      "rebalances": 114
+    },
+    {
+      "n": 2390,
+      "cagr": 0.2590312298034698,
+      "annualized_arithmetic_return": 0.25105879090102307,
+      "annualized_volatility": 0.2026474486342805,
+      "sharpe": 1.1145405107400699,
+      "max_drawdown": -0.3292611757515055,
+      "terminal_wealth": 8.88707602086546,
+      "id": "hybrid_cap_monthly_10bps_lag0",
+      "model": "hybrid_cap",
+      "frequency": "monthly",
+      "cost_bps": 10,
+      "execution_lag": 0,
+      "start": "2015-07-06",
+      "end": "2024-12-31",
+      "sharpe_rf_zero": 1.2388944079632158,
+      "annualized_traded_notional": 2.3017913022099763,
+      "sum_daily_cost_fractions": 0.021830481001118063,
+      "rebalances": 114
+    }
+  ],
+  "contextual_index": {
+    "n": 2390,
+    "cagr": 0.11601460917559807,
+    "annualized_arithmetic_return": 0.12619314647199129,
+    "annualized_volatility": 0.1807522327154468,
+    "sharpe": 0.5587380302570425,
+    "max_drawdown": -0.33924960002653237,
+    "terminal_wealth": 2.832090929150594,
+    "id": "sp500_price_reference",
+    "role": "context only, not a matched total-return comparator"
+  },
+  "paired_sharpe_intervals": [
+    {
+      "difference": -0.003837774052117826,
+      "ci95_lower": -0.028856236227421922,
+      "ci95_upper": 0.01939174618238401,
+      "block_length": 21,
+      "resamples": 2000,
+      "baseline": "snapshot_cap",
+      "overlay": "hybrid_cap"
+    },
+    {
+      "difference": -0.003837774052117826,
+      "ci95_lower": -0.028550483167898905,
+      "ci95_upper": 0.019328421435911944,
+      "block_length": 5,
+      "resamples": 1000,
+      "baseline": "snapshot_cap",
+      "overlay": "hybrid_cap"
+    },
+    {
+      "difference": -0.003837774052117826,
+      "ci95_lower": -0.03231882335686249,
+      "ci95_upper": 0.01785078484536849,
+      "block_length": 63,
+      "resamples": 1000,
+      "baseline": "snapshot_cap",
+      "overlay": "hybrid_cap"
+    },
+    {
+      "difference": -0.009634548896324535,
+      "ci95_lower": -0.02251742721518156,
+      "ci95_upper": 0.0009480217260290282,
+      "block_length": 21,
+      "resamples": 2000,
+      "baseline": "equal_weight",
+      "overlay": "hybrid_equal"
+    },
+    {
+      "difference": -0.009634548896324535,
+      "ci95_lower": -0.02204685968133689,
+      "ci95_upper": 0.0010752191215261662,
+      "block_length": 5,
+      "resamples": 1000,
+      "baseline": "equal_weight",
+      "overlay": "hybrid_equal"
+    },
+    {
+      "difference": -0.009634548896324535,
+      "ci95_lower": -0.0241149468716913,
+      "ci95_upper": 0.0008184477032637065,
+      "block_length": 63,
+      "resamples": 1000,
+      "baseline": "equal_weight",
+      "overlay": "hybrid_equal"
+    }
+  ],
+  "monthly_nav": [
+    {
+      "date": "2015-07-31",
+      "snapshot_cap": 1.0335453797204806,
+      "hybrid_cap": 1.0330146844972268,
+      "equal_weight": 1.013775072861738,
+      "hybrid_equal": 1.014117262363933,
+      "sp500_price_reference": 1.0130298145263428
+    },
+    {
+      "date": "2015-08-31",
+      "snapshot_cap": 0.9923482326844799,
+      "hybrid_cap": 0.9917728304965296,
+      "equal_weight": 0.9591927048224824,
+      "hybrid_equal": 0.9599855466598193,
+      "sp500_price_reference": 0.9496335798156966
+    },
+    {
+      "date": "2015-09-30",
+      "snapshot_cap": 0.9824608901014529,
+      "hybrid_cap": 0.9797638578365504,
+      "equal_weight": 0.9340425372336109,
+      "hybrid_equal": 0.9363246906868067,
+      "sp500_price_reference": 0.9245225792868067
+    },
+    {
+      "date": "2015-10-31",
+      "snapshot_cap": 1.075887154714657,
+      "hybrid_cap": 1.0671839560156624,
+      "equal_weight": 1.0014370929416665,
+      "hybrid_equal": 1.0029244297328153,
+      "sp500_price_reference": 1.0012423454042343
+    },
+    {
+      "date": "2015-11-30",
+      "snapshot_cap": 1.1046468152232154,
+      "hybrid_cap": 1.0936316528491663,
+      "equal_weight": 1.0092578266366206,
+      "hybrid_equal": 1.0095539132622795,
+      "sp500_price_reference": 1.0017478417363888
+    },
+    {
+      "date": "2015-12-31",
+      "snapshot_cap": 1.099200387767281,
+      "hybrid_cap": 1.0895015839399844,
+      "equal_weight": 0.9907002789400243,
+      "hybrid_equal": 0.9904902047349508,
+      "sp500_price_reference": 0.9841870167146493
+    },
+    {
+      "date": "2016-01-31",
+      "snapshot_cap": 1.0359790954129564,
+      "hybrid_cap": 1.0268906271627056,
+      "equal_weight": 0.9361966246820008,
+      "hybrid_equal": 0.9356137926208473,
+      "sp500_price_reference": 0.9342539714672029
+    },
+    {
+      "date": "2016-02-29",
+      "snapshot_cap": 1.032601239106777,
+      "hybrid_cap": 1.0250980062150812,
+      "equal_weight": 0.9490089486998007,
+      "hybrid_equal": 0.9482760232649377,
+      "sp500_price_reference": 0.9303970344528687
+    },
+    {
+      "date": "2016-03-31",
+      "snapshot_cap": 1.120558074078725,
+      "hybrid_cap": 1.1133692770902646,
+      "equal_weight": 1.0260429652567111,
+      "hybrid_equal": 1.0248981712075607,
+      "sp500_price_reference": 0.9917949716281396
+    },
+    {
+      "date": "2016-04-30",
+      "snapshot_cap": 1.115042573170919,
+      "hybrid_cap": 1.1115332929081714,
+      "equal_weight": 1.0353078590257394,
+      "hybrid_equal": 1.036331441760959,
+      "sp500_price_reference": 0.994472221271971
+    },
+    {
+      "date": "2016-05-31",
+      "snapshot_cap": 1.1756986624293873,
+      "hybrid_cap": 1.1671236011523758,
+      "equal_weight": 1.0625794623006064,
+      "hybrid_equal": 1.0631899731607597,
+      "sp500_price_reference": 1.0097121127854054
+    },
+    {
+      "date": "2016-06-30",
+      "snapshot_cap": 1.1641602505544848,
+      "hybrid_cap": 1.1570397210674679,
+      "equal_weight": 1.067312852453428,
+      "hybrid_equal": 1.0684474543742526,
+      "sp500_price_reference": 1.0106318809953525
+    },
+    {
+      "date": "2016-07-31",
+      "snapshot_cap": 1.247483532141335,
+      "hybrid_cap": 1.2398130838670536,
+      "equal_weight": 1.1146083955441983,
+      "hybrid_equal": 1.115390040744423,
+      "sp500_price_reference": 1.0466202809125458
+    },
+    {
+      "date": "2016-08-31",
+      "snapshot_cap": 1.2670220022261522,
+      "hybrid_cap": 1.2614656382347211,
+      "equal_weight": 1.1232996752837876,
+      "hybrid_equal": 1.12523430805385,
+      "sp500_price_reference": 1.0453441965670736
+    },
+    {
+      "date": "2016-09-30",
+      "snapshot_cap": 1.2876632745578975,
+      "hybrid_cap": 1.2829944722681998,
+      "equal_weight": 1.1265101689130659,
+      "hybrid_equal": 1.128992361220243,
+      "sp500_price_reference": 1.0440537702326431
+    },
+    {
+      "date": "2016-10-31",
+      "snapshot_cap": 1.282235730518596,
+      "hybrid_cap": 1.277455225437714,
+      "equal_weight": 1.1010688479858202,
+      "hybrid_equal": 1.1038453839023055,
+      "sp500_price_reference": 1.0237723169283375
+    },
+    {
+      "date": "2016-11-30",
+      "snapshot_cap": 1.3348653873306475,
+      "hybrid_cap": 1.3235788235052532,
+      "equal_weight": 1.1557179250290268,
+      "hybrid_equal": 1.1574417591000818,
+      "sp500_price_reference": 1.0587592463214333
+    },
+    {
+      "date": "2016-12-31",
+      "snapshot_cap": 1.3793283637826381,
+      "hybrid_cap": 1.3691316440200378,
+      "equal_weight": 1.1750321202238125,
+      "hybrid_equal": 1.1777549880529752,
+      "sp500_price_reference": 1.0780294718468588
+    },
+    {
+      "date": "2017-01-31",
+      "snapshot_cap": 1.4359292838251438,
+      "hybrid_cap": 1.4271045062242234,
+      "equal_weight": 1.2113135468951057,
+      "hybrid_equal": 1.2157127777891692,
+      "sp500_price_reference": 1.0973093370697813
+    },
+    {
+      "date": "2017-02-28",
+      "snapshot_cap": 1.4894336618550994,
+      "hybrid_cap": 1.4817089984651046,
+      "equal_weight": 1.2597575095095952,
+      "hybrid_equal": 1.264653821248289,
+      "sp500_price_reference": 1.1381272254329151
+    },
+    {
+      "date": "2017-03-31",
+      "snapshot_cap": 1.5175397691457493,
+      "hybrid_cap": 1.508081350225603,
+      "equal_weight": 1.2635003663948148,
+      "hybrid_equal": 1.2675355126618513,
+      "sp500_price_reference": 1.1376842695772051
+    },
+    {
+      "date": "2017-04-30",
+      "snapshot_cap": 1.5496360597112457,
+      "hybrid_cap": 1.5417802094026638,
+      "equal_weight": 1.279043368951917,
+      "hybrid_equal": 1.2826686455852614,
+      "sp500_price_reference": 1.1480271947622207
+    },
+    {
+      "date": "2017-05-31",
+      "snapshot_cap": 1.6360663314190962,
+      "hybrid_cap": 1.629471876623544,
+      "equal_weight": 1.3028946036201587,
+      "hybrid_equal": 1.3071749315277257,
+      "sp500_price_reference": 1.1613170460064066
+    },
+    {
+      "date": "2017-06-30",
+      "snapshot_cap": 1.631460800687055,
+      "hybrid_cap": 1.6243912908415508,
+      "equal_weight": 1.3163102696877982,
+      "hybrid_equal": 1.3196166178672484,
+      "sp500_price_reference": 1.1669073652108832
+    },
+    {
+      "date": "2017-07-31",
+      "snapshot_cap": 1.6884281511848052,
+      "hybrid_cap": 1.6793296386243537,
+      "equal_weight": 1.3414205985949137,
+      "hybrid_equal": 1.3422820842168788,
+      "sp500_price_reference": 1.1894856527797535
+    },
+    {
+      "date": "2017-08-31",
+      "snapshot_cap": 1.7188735069754246,
+      "hybrid_cap": 1.7108595517256628,
+      "equal_weight": 1.3457887783880402,
+      "hybrid_equal": 1.3454402354913282,
+      "sp500_price_reference": 1.1901356270170746
+    },
+    {
+      "date": "2017-09-30",
+      "snapshot_cap": 1.7484525330779057,
+      "hybrid_cap": 1.741824815986239,
+      "equal_weight": 1.383082621158291,
+      "hybrid_equal": 1.3832250180718597,
+      "sp500_price_reference": 1.2131087895114574
+    },
+    {
+      "date": "2017-10-31",
+      "snapshot_cap": 1.842778545578302,
+      "hybrid_cap": 1.837991236541288,
+      "equal_weight": 1.416795591024536,
+      "hybrid_equal": 1.4160372001538333,
+      "sp500_price_reference": 1.2400254111830735
+    },
+    {
+      "date": "2017-11-30",
+      "snapshot_cap": 1.8866723517692592,
+      "hybrid_cap": 1.881035070562308,
+      "equal_weight": 1.4724181268271193,
+      "hybrid_equal": 1.4707488526764416,
+      "sp500_price_reference": 1.2748485832760086
+    },
+    {
+      "date": "2017-12-31",
+      "snapshot_cap": 1.8961025574321773,
+      "hybrid_cap": 1.8885890521840103,
+      "equal_weight": 1.4878694000021753,
+      "hybrid_equal": 1.4834105329469207,
+      "sp500_price_reference": 1.2873824236104088
+    },
+    {
+      "date": "2018-01-31",
+      "snapshot_cap": 2.0626233816698134,
+      "hybrid_cap": 2.036327135364781,
+      "equal_weight": 1.561249287508567,
+      "hybrid_equal": 1.554479461611398,
+      "sp500_price_reference": 1.3597058998828235
+    },
+    {
+      "date": "2018-02-28",
+      "snapshot_cap": 2.011100313907325,
+      "hybrid_cap": 1.9872066141166298,
+      "equal_weight": 1.5031155245943641,
+      "hybrid_equal": 1.4988890825717818,
+      "sp500_price_reference": 1.306748928553517
+    },
+    {
+      "date": "2018-03-31",
+      "snapshot_cap": 1.945177029941824,
+      "hybrid_cap": 1.9261519558262623,
+      "equal_weight": 1.4990291166043541,
+      "hybrid_equal": 1.4952995137136893,
+      "sp500_price_reference": 1.2716176388125413
+    },
+    {
+      "date": "2018-04-30",
+      "snapshot_cap": 1.9588271599999796,
+      "hybrid_cap": 1.9341439105993385,
+      "equal_weight": 1.5007198905349097,
+      "hybrid_equal": 1.4962378006030188,
+      "sp500_price_reference": 1.2750748810526151
+    },
+    {
+      "date": "2018-05-31",
+      "snapshot_cap": 2.051905418569744,
+      "hybrid_cap": 2.0242707246004796,
+      "equal_weight": 1.5392674625707021,
+      "hybrid_equal": 1.53342492200428,
+      "sp500_price_reference": 1.3026271349725929
+    },
+    {
+      "date": "2018-06-30",
+      "snapshot_cap": 2.0670225154063435,
+      "hybrid_cap": 2.0355507360147995,
+      "equal_weight": 1.5560095608785218,
+      "hybrid_equal": 1.5505516682263885,
+      "sp500_price_reference": 1.3089350238541548
+    },
+    {
+      "date": "2018-07-31",
+      "snapshot_cap": 2.142264868090491,
+      "hybrid_cap": 2.1080264534942126,
+      "equal_weight": 1.6085706063814544,
+      "hybrid_equal": 1.6017827036885801,
+      "sp500_price_reference": 1.3560849003425932
+    },
+    {
+      "date": "2018-08-31",
+      "snapshot_cap": 2.254289885272658,
+      "hybrid_cap": 2.207533765484331,
+      "equal_weight": 1.6590516744716846,
+      "hybrid_equal": 1.6473942720018522,
+      "sp500_price_reference": 1.39712438419087
+    },
+    {
+      "date": "2018-09-30",
+      "snapshot_cap": 2.263073523687188,
+      "hybrid_cap": 2.2157484271824703,
+      "equal_weight": 1.6629095475729385,
+      "hybrid_equal": 1.6505418839629737,
+      "sp500_price_reference": 1.4031240378671044
+    },
+    {
+      "date": "2018-10-31",
+      "snapshot_cap": 2.0847522933193208,
+      "hybrid_cap": 2.0380782964694935,
+      "equal_weight": 1.546044241168925,
+      "hybrid_equal": 1.5353278839948405,
+      "sp500_price_reference": 1.3057425206233897
+    },
+    {
+      "date": "2018-11-30",
+      "snapshot_cap": 2.0856501760060753,
+      "hybrid_cap": 2.045558853466455,
+      "equal_weight": 1.5915103410740132,
+      "hybrid_equal": 1.5802359338066347,
+      "sp500_price_reference": 1.3290622419985147
+    },
+    {
+      "date": "2018-12-31",
+      "snapshot_cap": 1.9047976959175617,
+      "hybrid_cap": 1.858098369946361,
+      "equal_weight": 1.4490598932749628,
+      "hybrid_equal": 1.4372113136985387,
+      "sp500_price_reference": 1.20708503659149
+    },
+    {
+      "date": "2019-01-31",
+      "snapshot_cap": 2.0654788764937373,
+      "hybrid_cap": 2.0194499996601616,
+      "equal_weight": 1.5892893341724017,
+      "hybrid_equal": 1.5764945683270475,
+      "sp500_price_reference": 1.3020638004554643
+    },
+    {
+      "date": "2019-02-28",
+      "snapshot_cap": 2.1430906244343495,
+      "hybrid_cap": 2.0916404987508415,
+      "equal_weight": 1.6607031030246393,
+      "hybrid_equal": 1.6467993921725226,
+      "sp500_price_reference": 1.3407727110979388
+    },
+    {
+      "date": "2019-03-31",
+      "snapshot_cap": 2.224337314230924,
+      "hybrid_cap": 2.169002191173353,
+      "equal_weight": 1.6836380844480339,
+      "hybrid_equal": 1.6692612857103453,
+      "sp500_price_reference": 1.3648050647441154
+    },
+    {
+      "date": "2019-04-30",
+      "snapshot_cap": 2.324835839577293,
+      "hybrid_cap": 2.2687344853699822,
+      "equal_weight": 1.7508457537268722,
+      "hybrid_equal": 1.7347467501969402,
+      "sp500_price_reference": 1.4184603263555144
+    },
+    {
+      "date": "2019-05-31",
+      "snapshot_cap": 2.133778132018291,
+      "hybrid_cap": 2.0848897460466365,
+      "equal_weight": 1.6504140212625824,
+      "hybrid_equal": 1.6344425518319525,
+      "sp500_price_reference": 1.3251572240539893
+    },
+    {
+      "date": "2019-06-30",
+      "snapshot_cap": 2.31191139830428,
+      "hybrid_cap": 2.25748367202482,
+      "equal_weight": 1.7742851719960175,
+      "hybrid_equal": 1.7584879422411455,
+      "sp500_price_reference": 1.4165005288314851
+    },
+    {
+      "date": "2019-07-31",
+      "snapshot_cap": 2.372584462618341,
+      "hybrid_cap": 2.3175788788818994,
+      "equal_weight": 1.7988966141831517,
+      "hybrid_equal": 1.7820493938934487,
+      "sp500_price_reference": 1.4350965633185617
+    },
+    {
+      "date": "2019-08-31",
+      "snapshot_cap": 2.3334201962279373,
+      "hybrid_cap": 2.280922515387127,
+      "equal_weight": 1.7658562966804827,
+      "hybrid_equal": 1.7505333731856727,
+      "sp500_price_reference": 1.4091333312408454
+    },
+    {
+      "date": "2019-09-30",
+      "snapshot_cap": 2.376866738510787,
+      "hybrid_cap": 2.323186590882987,
+      "equal_weight": 1.8073727321766295,
+      "hybrid_equal": 1.790853333931426,
+      "sp500_price_reference": 1.4333439017334269
+    },
+    {
+      "date": "2019-10-31",
+      "snapshot_cap": 2.4803558475314937,
+      "hybrid_cap": 2.4231393998274715,
+      "equal_weight": 1.8311702224359518,
+      "hybrid_equal": 1.8147422717379407,
+      "sp500_price_reference": 1.4626296554008331
+    },
+    {
+      "date": "2019-11-30",
+      "snapshot_cap": 2.5909582772696487,
+      "hybrid_cap": 2.531756343885239,
+      "equal_weight": 1.9039411642942314,
+      "hybrid_equal": 1.886076494006652,
+      "sp500_price_reference": 1.5124278624406122
+    },
+    {
+      "date": "2019-12-31",
+      "snapshot_cap": 2.6925856646963737,
+      "hybrid_cap": 2.6248735989631173,
+      "equal_weight": 1.9581274854175064,
+      "hybrid_equal": 1.939503286188447,
+      "sp500_price_reference": 1.5556679011357692
+    },
+    {
+      "date": "2020-01-31",
+      "snapshot_cap": 2.7637429911236073,
+      "hybrid_cap": 2.6937021174008815,
+      "equal_weight": 1.9483734646764828,
+      "hybrid_equal": 1.9299089717761428,
+      "sp500_price_reference": 1.553135129397106
+    },
+    {
+      "date": "2020-02-29",
+      "snapshot_cap": 2.604700390861346,
+      "hybrid_cap": 2.5397438663115817,
+      "equal_weight": 1.790241093264986,
+      "hybrid_equal": 1.7744100393890092,
+      "sp500_price_reference": 1.4225001825077215
+    },
+    {
+      "date": "2020-03-31",
+      "snapshot_cap": 2.313332643617257,
+      "hybrid_cap": 2.274901139260642,
+      "equal_weight": 1.4841926324088894,
+      "hybrid_equal": 1.4710478359915746,
+      "sp500_price_reference": 1.2445179804457864
+    },
+    {
+      "date": "2020-04-30",
+      "snapshot_cap": 2.653465399650543,
+      "hybrid_cap": 2.6024753677923766,
+      "equal_weight": 1.7113565660161376,
+      "hybrid_equal": 1.7003624293959179,
+      "sp500_price_reference": 1.402377666654829
+    },
+    {
+      "date": "2020-05-31",
+      "snapshot_cap": 2.8218308708803304,
+      "hybrid_cap": 2.775393011890295,
+      "equal_weight": 1.8187663256465205,
+      "hybrid_equal": 1.8034315084099195,
+      "sp500_price_reference": 1.4658798792592997
+    },
+    {
+      "date": "2020-06-30",
+      "snapshot_cap": 2.9259612820250203,
+      "hybrid_cap": 2.88630331969541,
+      "equal_weight": 1.8423233202295701,
+      "hybrid_equal": 1.8259436665411986,
+      "sp500_price_reference": 1.4928350597209035
+    },
+    {
+      "date": "2020-07-31",
+      "snapshot_cap": 3.115269700444355,
+      "hybrid_cap": 3.0721893566234186,
+      "equal_weight": 1.932329388370901,
+      "hybrid_equal": 1.9159723929402066,
+      "sp500_price_reference": 1.5750922442638622
+    },
+    {
+      "date": "2020-08-31",
+      "snapshot_cap": 3.43318275435173,
+      "hybrid_cap": 3.4146887171360163,
+      "equal_weight": 2.0264300837131577,
+      "hybrid_equal": 2.01261820380845,
+      "sp500_price_reference": 1.6854505576976881
+    },
+    {
+      "date": "2020-09-30",
+      "snapshot_cap": 3.2956701163967654,
+      "hybrid_cap": 3.2806380973376754,
+      "equal_weight": 1.9817830077081815,
+      "hybrid_equal": 1.9667363328625838,
+      "sp500_price_reference": 1.619333753483118
+    },
+    {
+      "date": "2020-10-31",
+      "snapshot_cap": 3.2233465956992764,
+      "hybrid_cap": 3.212789033724287,
+      "equal_weight": 1.9706356190223602,
+      "hybrid_equal": 1.9547689569074598,
+      "sp500_price_reference": 1.5745336120381903
+    },
+    {
+      "date": "2020-11-30",
+      "snapshot_cap": 3.656446935088046,
+      "hybrid_cap": 3.6438265761759507,
+      "equal_weight": 2.2656357746721807,
+      "hybrid_equal": 2.2470151326216024,
+      "sp500_price_reference": 1.7438678298725527
+    },
+    {
+      "date": "2020-12-31",
+      "snapshot_cap": 3.801787310959713,
+      "hybrid_cap": 3.7906050310862294,
+      "equal_weight": 2.358508047302475,
+      "hybrid_equal": 2.339294677810323,
+      "sp500_price_reference": 1.80860274818376
+    },
+    {
+      "date": "2021-01-31",
+      "snapshot_cap": 3.8029338618512756,
+      "hybrid_cap": 3.786133773535245,
+      "equal_weight": 2.3416322733600845,
+      "hybrid_equal": 2.3207214929843585,
+      "sp500_price_reference": 1.7884609529358728
+    },
+    {
+      "date": "2021-02-28",
+      "snapshot_cap": 3.940190761115552,
+      "hybrid_cap": 3.9253917086045687,
+      "equal_weight": 2.474660864224244,
+      "hybrid_equal": 2.453257066834475,
+      "sp500_price_reference": 1.8351244949298648
+    },
+    {
+      "date": "2021-03-31",
+      "snapshot_cap": 4.085499531835763,
+      "hybrid_cap": 4.067528961878608,
+      "equal_weight": 2.6157332141957625,
+      "hybrid_equal": 2.5968042695074756,
+      "sp500_price_reference": 1.9130046690228046
+    },
+    {
+      "date": "2021-04-30",
+      "snapshot_cap": 4.3525086854465,
+      "hybrid_cap": 4.333095527418778,
+      "equal_weight": 2.7446160288363486,
+      "hybrid_equal": 2.7247896164714978,
+      "sp500_price_reference": 2.013294553535705
+    },
+    {
+      "date": "2021-05-31",
+      "snapshot_cap": 4.402234777455758,
+      "hybrid_cap": 4.381310231407676,
+      "equal_weight": 2.793567983442148,
+      "hybrid_equal": 2.7735196071278536,
+      "sp500_price_reference": 2.0243404712942743
+    },
+    {
+      "date": "2021-06-30",
+      "snapshot_cap": 4.5969201503931005,
+      "hybrid_cap": 4.584614380600601,
+      "equal_weight": 2.814973456755208,
+      "hybrid_equal": 2.796498083614436,
+      "sp500_price_reference": 2.069309189888113
+    },
+    {
+      "date": "2021-07-31",
+      "snapshot_cap": 4.70968597225991,
+      "hybrid_cap": 4.69914927228049,
+      "equal_weight": 2.858421308129065,
+      "hybrid_equal": 2.837484501131887,
+      "sp500_price_reference": 2.1163819487965765
+    },
+    {
+      "date": "2021-08-31",
+      "snapshot_cap": 4.913559742256935,
+      "hybrid_cap": 4.902589418224203,
+      "equal_weight": 2.9326879998168183,
+      "hybrid_equal": 2.9100707719246106,
+      "sp500_price_reference": 2.1777367424476877
+    },
+    {
+      "date": "2021-09-30",
+      "snapshot_cap": 4.693684354724881,
+      "hybrid_cap": 4.681456937845521,
+      "equal_weight": 2.8274561933486635,
+      "hybrid_equal": 2.803811230618225,
+      "sp500_price_reference": 2.0741436157400925
+    },
+    {
+      "date": "2021-10-31",
+      "snapshot_cap": 5.102223317188933,
+      "hybrid_cap": 5.1026341772038695,
+      "equal_weight": 2.992017810017909,
+      "hybrid_equal": 2.9685720202399994,
+      "sp500_price_reference": 2.2175578625781873
+    },
+    {
+      "date": "2021-11-30",
+      "snapshot_cap": 5.145283796344911,
+      "hybrid_cap": 5.152741170895716,
+      "equal_weight": 2.9212955537028167,
+      "hybrid_equal": 2.8957164224756715,
+      "sp500_price_reference": 2.1990773869037894
+    },
+    {
+      "date": "2021-12-31",
+      "snapshot_cap": 5.3413696993221516,
+      "hybrid_cap": 5.352867393354924,
+      "equal_weight": 3.1079545595939706,
+      "hybrid_equal": 3.0813529019685215,
+      "sp500_price_reference": 2.2949855586752075
+    },
+    {
+      "date": "2022-01-31",
+      "snapshot_cap": 5.0381198574329655,
+      "hybrid_cap": 5.045973485242354,
+      "equal_weight": 2.9670237571962104,
+      "hybrid_equal": 2.9391710543680496,
+      "sp500_price_reference": 2.1743033643367884
+    },
+    {
+      "date": "2022-02-28",
+      "snapshot_cap": 4.902703024583301,
+      "hybrid_cap": 4.909677073768742,
+      "equal_weight": 2.9322876981343833,
+      "hybrid_equal": 2.9043196870471655,
+      "sp500_price_reference": 2.106116141191543
+    },
+    {
+      "date": "2022-03-31",
+      "snapshot_cap": 5.136832687563873,
+      "hybrid_cap": 5.145971193905708,
+      "equal_weight": 3.0304673015117563,
+      "hybrid_equal": 3.00136442710585,
+      "sp500_price_reference": 2.181458841254358
+    },
+    {
+      "date": "2022-04-30",
+      "snapshot_cap": 4.570599378191576,
+      "hybrid_cap": 4.576138124763289,
+      "equal_weight": 2.8382392069464686,
+      "hybrid_equal": 2.807939593460344,
+      "sp500_price_reference": 1.9895848946411143
+    },
+    {
+      "date": "2022-05-31",
+      "snapshot_cap": 4.559705596948061,
+      "hybrid_cap": 4.568351868389677,
+      "equal_weight": 2.8694822354390346,
+      "hybrid_equal": 2.8364731262674847,
+      "sp500_price_reference": 1.9896906961990077
+    },
+    {
+      "date": "2022-06-30",
+      "snapshot_cap": 4.14799356328091,
+      "hybrid_cap": 4.158747235956807,
+      "equal_weight": 2.6116590824874195,
+      "hybrid_equal": 2.578702400092399,
+      "sp500_price_reference": 1.8227158531056513
+    },
+    {
+      "date": "2022-07-31",
+      "snapshot_cap": 4.604450102571833,
+      "hybrid_cap": 4.610314244867167,
+      "equal_weight": 2.8559748745780507,
+      "hybrid_equal": 2.8168042162884914,
+      "sp500_price_reference": 1.9887951447900902
+    },
+    {
+      "date": "2022-08-31",
+      "snapshot_cap": 4.389780659782234,
+      "hybrid_cap": 4.394466847507166,
+      "equal_weight": 2.7760649151633885,
+      "hybrid_equal": 2.7387889169743667,
+      "sp500_price_reference": 1.9043904237364848
+    },
+    {
+      "date": "2022-09-30",
+      "snapshot_cap": 3.9539929830092184,
+      "hybrid_cap": 3.9576155417273613,
+      "equal_weight": 2.52670903211371,
+      "hybrid_equal": 2.4930676727674155,
+      "sp500_price_reference": 1.726528600335971
+    },
+    {
+      "date": "2022-10-31",
+      "snapshot_cap": 4.235002247173224,
+      "hybrid_cap": 4.238730351486038,
+      "equal_weight": 2.7808318042939644,
+      "hybrid_equal": 2.7474610365619103,
+      "sp500_price_reference": 1.864415068446036
+    },
+    {
+      "date": "2022-11-30",
+      "snapshot_cap": 4.565769849943088,
+      "hybrid_cap": 4.58537003607088,
+      "equal_weight": 2.9794394753613997,
+      "hybrid_equal": 2.9435334015684376,
+      "sp500_price_reference": 1.964632772784998
+    },
+    {
+      "date": "2022-12-31",
+      "snapshot_cap": 4.246456710186866,
+      "hybrid_cap": 4.255222710309045,
+      "equal_weight": 2.829254069940756,
+      "hybrid_equal": 2.7922824526136933,
+      "sp500_price_reference": 1.8487754821583426
+    },
+    {
+      "date": "2023-01-31",
+      "snapshot_cap": 4.703613211909114,
+      "hybrid_cap": 4.701237439993345,
+      "equal_weight": 3.0380644187145984,
+      "hybrid_equal": 2.9920356378920023,
+      "sp500_price_reference": 1.9629426516763078
+    },
+    {
+      "date": "2023-02-28",
+      "snapshot_cap": 4.691961905934752,
+      "hybrid_cap": 4.686342424937127,
+      "equal_weight": 2.9547418342611764,
+      "hybrid_equal": 2.9094424601574893,
+      "sp500_price_reference": 1.9116853235959035
+    },
+    {
+      "date": "2023-03-31",
+      "snapshot_cap": 4.99597223159604,
+      "hybrid_cap": 5.000785552368241,
+      "equal_weight": 2.9701255248582243,
+      "hybrid_equal": 2.925378313684533,
+      "sp500_price_reference": 1.9786929769279333
+    },
+    {
+      "date": "2023-04-30",
+      "snapshot_cap": 5.084348999367169,
+      "hybrid_cap": 5.088268487835783,
+      "equal_weight": 2.9853239929332065,
+      "hybrid_equal": 2.9402979325521743,
+      "sp500_price_reference": 2.0076656755412654
+    },
+    {
+      "date": "2023-05-31",
+      "snapshot_cap": 5.38230273046585,
+      "hybrid_cap": 5.4041400871428475,
+      "equal_weight": 2.905976585775094,
+      "hybrid_equal": 2.8649035968371543,
+      "sp500_price_reference": 2.012649399147159
+    },
+    {
+      "date": "2023-06-30",
+      "snapshot_cap": 5.766663868435551,
+      "hybrid_cap": 5.789281740074492,
+      "equal_weight": 3.138754694013339,
+      "hybrid_equal": 3.096139216906575,
+      "sp500_price_reference": 2.1429230924949865
+    },
+    {
+      "date": "2023-07-31",
+      "snapshot_cap": 6.016145292233287,
+      "hybrid_cap": 6.024520114200047,
+      "equal_weight": 3.248060373561265,
+      "hybrid_equal": 3.2022722772170895,
+      "sp500_price_reference": 2.2096514297141816
+    },
+    {
+      "date": "2023-08-31",
+      "snapshot_cap": 5.975271351250552,
+      "hybrid_cap": 5.9806418417293035,
+      "equal_weight": 3.1621017610503848,
+      "hybrid_equal": 3.118341037195915,
+      "sp500_price_reference": 2.1705043830647464
+    },
+    {
+      "date": "2023-09-30",
+      "snapshot_cap": 5.688482754952333,
+      "hybrid_cap": 5.689352952657502,
+      "equal_weight": 3.0152797747906583,
+      "hybrid_equal": 2.973760616250604,
+      "sp500_price_reference": 2.0647587824404665
+    },
+    {
+      "date": "2023-10-31",
+      "snapshot_cap": 5.580113667179562,
+      "hybrid_cap": 5.584264164930535,
+      "equal_weight": 2.905064589421951,
+      "hybrid_equal": 2.864907889231314,
+      "sp500_price_reference": 2.0193760270834087
+    },
+    {
+      "date": "2023-11-30",
+      "snapshot_cap": 6.150183298682905,
+      "hybrid_cap": 6.1582736455406195,
+      "equal_weight": 3.183983112838827,
+      "hybrid_equal": 3.141237141289838,
+      "sp500_price_reference": 2.199462504574546
+    },
+    {
+      "date": "2023-12-31",
+      "snapshot_cap": 6.4528389899612755,
+      "hybrid_cap": 6.456170527187998,
+      "equal_weight": 3.3975573067731104,
+      "hybrid_equal": 3.349083028306608,
+      "sp500_price_reference": 2.29674304010912
+    },
+    {
+      "date": "2024-01-31",
+      "snapshot_cap": 6.6655622156564815,
+      "hybrid_cap": 6.672960282591515,
+      "equal_weight": 3.388123755166073,
+      "hybrid_equal": 3.3412889070382166,
+      "sp500_price_reference": 2.333251395904714
+    },
+    {
+      "date": "2024-02-29",
+      "snapshot_cap": 7.135611749828642,
+      "hybrid_cap": 7.126817693145907,
+      "equal_weight": 3.5443931263895303,
+      "hybrid_equal": 3.4944315016820298,
+      "sp500_price_reference": 2.4539286528371025
+    },
+    {
+      "date": "2024-03-31",
+      "snapshot_cap": 7.420616574771838,
+      "hybrid_cap": 7.403534755332681,
+      "equal_weight": 3.709135038581911,
+      "hybrid_equal": 3.653338563823345,
+      "sp500_price_reference": 2.530046525647411
+    },
+    {
+      "date": "2024-04-30",
+      "snapshot_cap": 7.183305918429145,
+      "hybrid_cap": 7.175719316205353,
+      "equal_weight": 3.5330937690112245,
+      "hybrid_equal": 3.47541865849629,
+      "sp500_price_reference": 2.4247584579823735
+    },
+    {
+      "date": "2024-05-31",
+      "snapshot_cap": 7.6104162874280314,
+      "hybrid_cap": 7.59729256751163,
+      "equal_weight": 3.636617341780287,
+      "hybrid_equal": 3.5740593601670145,
+      "sp500_price_reference": 2.541198244963874
+    },
+    {
+      "date": "2024-06-30",
+      "snapshot_cap": 7.962061012052695,
+      "hybrid_cap": 7.92383456542007,
+      "equal_weight": 3.632084140401984,
+      "hybrid_equal": 3.565562020184132,
+      "sp500_price_reference": 2.6293010831376917
+    },
+    {
+      "date": "2024-07-31",
+      "snapshot_cap": 8.058072884994615,
+      "hybrid_cap": 8.001330173055031,
+      "equal_weight": 3.7965838130602365,
+      "hybrid_equal": 3.7257006930322634,
+      "sp500_price_reference": 2.6590682338935108
+    },
+    {
+      "date": "2024-08-31",
+      "snapshot_cap": 8.26470099684741,
+      "hybrid_cap": 8.220352126815387,
+      "equal_weight": 3.89758518513829,
+      "hybrid_equal": 3.828375373410698,
+      "sp500_price_reference": 2.719787277738973
+    },
+    {
+      "date": "2024-09-30",
+      "snapshot_cap": 8.513261679705797,
+      "hybrid_cap": 8.438493511217622,
+      "equal_weight": 3.9945785157765403,
+      "hybrid_equal": 3.9202382309368273,
+      "sp500_price_reference": 2.7747185061385595
+    },
+    {
+      "date": "2024-10-31",
+      "snapshot_cap": 8.522196810129573,
+      "hybrid_cap": 8.459419514642049,
+      "equal_weight": 3.9374805648086326,
+      "hybrid_equal": 3.8680179473908156,
+      "sp500_price_reference": 2.747257829344804
+    },
+    {
+      "date": "2024-11-30",
+      "snapshot_cap": 9.071685154858157,
+      "hybrid_cap": 9.01276716724504,
+      "equal_weight": 4.197623044625399,
+      "hybrid_equal": 4.12591423776857,
+      "sp500_price_reference": 2.9046792619896
+    },
+    {
+      "date": "2024-12-31",
+      "snapshot_cap": 8.968902267372236,
+      "hybrid_cap": 8.921667477743135,
+      "equal_weight": 3.9365619910776375,
+      "hybrid_equal": 3.8670069002828793,
+      "sp500_price_reference": 2.832090929150594
+    }
+  ],
+  "calendar_returns": [
+    {
+      "model": "snapshot_cap",
+      "year": 2015,
+      "n": 126,
+      "return": 0.0992003877672809,
+      "sharpe": 0.9178925169909016
+    },
+    {
+      "model": "snapshot_cap",
+      "year": 2016,
+      "n": 252,
+      "return": 0.254847049848989,
+      "sharpe": 1.408635785312145
+    },
+    {
+      "model": "snapshot_cap",
+      "year": 2017,
+      "n": 251,
+      "return": 0.3746563959812663,
+      "sharpe": 3.215168408072696
+    },
+    {
+      "model": "snapshot_cap",
+      "year": 2018,
+      "n": 251,
+      "return": 0.004585795452519914,
+      "sharpe": -0.00241292296273353
+    },
+    {
+      "model": "snapshot_cap",
+      "year": 2019,
+      "n": 252,
+      "return": 0.4135809122760048,
+      "sharpe": 2.1809797197628376
+    },
+    {
+      "model": "snapshot_cap",
+      "year": 2020,
+      "n": 253,
+      "return": 0.41194665068842373,
+      "sharpe": 1.0659757424501617
+    },
+    {
+      "model": "snapshot_cap",
+      "year": 2021,
+      "n": 252,
+      "return": 0.40496278787720574,
+      "sharpe": 2.210961418120564
+    },
+    {
+      "model": "snapshot_cap",
+      "year": 2022,
+      "n": 251,
+      "return": -0.20498730677156263,
+      "sharpe": -0.7661700983369589
+    },
+    {
+      "model": "snapshot_cap",
+      "year": 2023,
+      "n": 250,
+      "return": 0.5195819551113043,
+      "sharpe": 2.623088453300159
+    },
+    {
+      "model": "snapshot_cap",
+      "year": 2024,
+      "n": 252,
+      "return": 0.38991570707486267,
+      "sharpe": 2.2337652165155033
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2015,
+      "n": 126,
+      "return": 0.08950158393998442,
+      "sharpe": 0.8328439644700453
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2016,
+      "n": 252,
+      "return": 0.25665869990644863,
+      "sharpe": 1.4198921106012459
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2017,
+      "n": 251,
+      "return": 0.3794064730245683,
+      "sharpe": 3.220342428028497
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2018,
+      "n": 251,
+      "return": -0.01614468865123997,
+      "sharpe": -0.10491443626538843
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2019,
+      "n": 252,
+      "return": 0.41266664963432276,
+      "sharpe": 2.181352518869908
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2020,
+      "n": 253,
+      "return": 0.4441095497259797,
+      "sharpe": 1.1297583724345412
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2021,
+      "n": 252,
+      "return": 0.4121406343992067,
+      "sharpe": 2.2462757415072496
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2022,
+      "n": 251,
+      "return": -0.20505732766862428,
+      "sharpe": -0.7610881437964321
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2023,
+      "n": 250,
+      "return": 0.5172344590911213,
+      "sharpe": 2.6267896601288507
+    },
+    {
+      "model": "hybrid_cap",
+      "year": 2024,
+      "n": 252,
+      "return": 0.38188225360103556,
+      "sharpe": 2.1651215890975513
+    },
+    {
+      "model": "equal_weight",
+      "year": 2015,
+      "n": 126,
+      "return": -0.009299721059975674,
+      "sharpe": -0.15972994669724394
+    },
+    {
+      "model": "equal_weight",
+      "year": 2016,
+      "n": 252,
+      "return": 0.18606216754174176,
+      "sharpe": 1.081401018853898
+    },
+    {
+      "model": "equal_weight",
+      "year": 2017,
+      "n": 251,
+      "return": 0.2662372154718424,
+      "sharpe": 2.975048169700128
+    },
+    {
+      "model": "equal_weight",
+      "year": 2018,
+      "n": 251,
+      "return": -0.02608394710392914,
+      "sharpe": -0.2541338205122169
+    },
+    {
+      "model": "equal_weight",
+      "year": 2019,
+      "n": 252,
+      "return": 0.3513088689467656,
+      "sharpe": 2.2893666900139746
+    },
+    {
+      "model": "equal_weight",
+      "year": 2020,
+      "n": 253,
+      "return": 0.2044711413667719,
+      "sharpe": 0.6174093644302802
+    },
+    {
+      "model": "equal_weight",
+      "year": 2021,
+      "n": 252,
+      "return": 0.31776296593461706,
+      "sharpe": 1.9229546024982127
+    },
+    {
+      "model": "equal_weight",
+      "year": 2022,
+      "n": 251,
+      "return": -0.08967328328301671,
+      "sharpe": -0.39745079471010397
+    },
+    {
+      "model": "equal_weight",
+      "year": 2023,
+      "n": 250,
+      "return": 0.20086680898342157,
+      "sharpe": 1.2065246861527725
+    },
+    {
+      "model": "equal_weight",
+      "year": 2024,
+      "n": 252,
+      "return": 0.15864476611770728,
+      "sharpe": 1.1148091847017214
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2015,
+      "n": 126,
+      "return": -0.009509795265049248,
+      "sharpe": -0.16337323609913335
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2016,
+      "n": 252,
+      "return": 0.18906273118383532,
+      "sharpe": 1.0996290678175282
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2017,
+      "n": 251,
+      "return": 0.25952388059867126,
+      "sharpe": 2.9171884812984596
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2018,
+      "n": 251,
+      "return": -0.03114392019086154,
+      "sharpe": -0.28726073059959717
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2019,
+      "n": 252,
+      "return": 0.34949068915781156,
+      "sharpe": 2.281349911692225
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2020,
+      "n": 253,
+      "return": 0.20613081424963875,
+      "sharpe": 0.6216397902123377
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2021,
+      "n": 252,
+      "return": 0.31721451392895794,
+      "sharpe": 1.9221929286205446
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2022,
+      "n": 251,
+      "return": -0.09381283434628718,
+      "sharpe": -0.4153537551422967
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2023,
+      "n": 250,
+      "return": 0.1994069672900507,
+      "sharpe": 1.2005121411112172
+    },
+    {
+      "model": "hybrid_equal",
+      "year": 2024,
+      "n": 252,
+      "return": 0.15464647116800445,
+      "sharpe": 1.082379282634606
+    }
+  ],
+  "legacy_replay": {
+    "yearly": {
+      "n": 2392,
+      "cagr": 0.22092852541932723,
+      "annualized_arithmetic_return": 0.22046459563876647,
+      "annualized_volatility": 0.2034029855945435,
+      "sharpe": 0.9599888372730191,
+      "max_drawdown": -0.3402526769548101,
+      "terminal_wealth": 6.6507292441079455
+    },
+    "monthly": {
+      "n": 2392,
+      "cagr": 0.22023454823653107,
+      "annualized_arithmetic_return": 0.22003484088054157,
+      "annualized_volatility": 0.20407018113066655,
+      "sharpe": 0.9547442933653714,
+      "max_drawdown": -0.3417593505474745,
+      "terminal_wealth": 6.6149330438734095
+    }
+  },
+  "source_sha256": {
+    "hybrid_vol_df.csv": "42643dd1ed4afcba543059dfc2ce208550d5b903f3fce1bae0d820a5ce07c97d",
+    "mcap_weight_df.csv": "d085018e2492c1f01522f3436cd8a0d5745fd74d0d7ef701997d4ff60748a350",
+    "log_ret_bt.csv": "2781b5ff6a7edd3999ccdc8e641dd6c6dcc9207f0f31d743c9943ee57cd578bb",
+    "cleaned_code.ipynb": "dd15b23ee226e8c31147ca8f46cf654c4fb30f4f50f1c8d7d6ab5b7da6303d8d",
+    "Untitled2.ipynb": "43283734bf9341f3bbdf562f210e08f262f72beb1f228e7d4e47f54a75fb85f7",
+    "data_load.ipynb": "c0df52c4bbb063e8f9c257cf8dc12cac789379b8c84763b24d98459052bfb8b8"
+  },
+  "code_sha256": {
+    "src/evaluation/portfolio.py": "8e6b75e47c8644ad4f3653a05acae156a8d0086b49bbf60a63798097af864aa8",
+    "scripts/evaluate_portfolio_overlay.py": "4b0c4a3fc77b57ee8ec51b2c21968af9e2040b3f735cd486dbb794f8728f00cc",
+    "docs/portfolio-overlay-protocol.md": "8910792d7652bfe4accb56c1569cb5638671c89d884832c8ce07ac9860eaee24",
+    "tests/test_portfolio.py": "c530c225fe294bd36eb3dc513eb8cf8c794b9f76fcb2b37ac5dc839a5b73e6ec"
+  },
+  "private_daily_output_sha256": {
+    "equal_weight_monthly_10bps_lag1.csv": "8ab1477baca39dce7df480351b2d4da0ceb5b96803051cee194b114303d5de85",
+    "hybrid_cap_daily_10bps_lag1.csv": "f746b49c94a97d713dec55db185b85498377c79ee12d5148c2c3eee18778351f",
+    "hybrid_cap_monthly_0bps_lag1.csv": "44ab29dbbae45e1654ae962a5f5406eca980acb35457a116c08e23087e26b8d1",
+    "hybrid_cap_monthly_10bps_lag0.csv": "7bba3c8d8adc52542177523bd09cbe727a3607235e5eb718931e9dd727727a55",
+    "hybrid_cap_monthly_10bps_lag1.csv": "c03c30cdf871d502dc3753a53efc934a35cb1c73c8a1f4949e3db47b07f92ab1",
+    "hybrid_cap_monthly_25bps_lag1.csv": "15569a6581171376da053c0c7e7bc36b5679acdd5615d19d0b3728ae22875e0a",
+    "hybrid_cap_weekly_10bps_lag1.csv": "b344a6a5b9efba2f324f9f367c322a543258ba1b40567fc1ccd7de63d3c70471",
+    "hybrid_cap_yearly_10bps_lag1.csv": "3fc6d3e2e715b651c21ca30b9831b9cbc8307cced647e9f082190fa4a9aa4fdf",
+    "hybrid_equal_monthly_10bps_lag1.csv": "33cc8737c1c719b1582119b6225842436968daba3e6c07973455a1b7880eec2f",
+    "snapshot_cap_daily_10bps_lag1.csv": "7a558373bb95d282db28427e74b17629d8c68f81e3e76254d44b2e1b32ce27ee",
+    "snapshot_cap_monthly_0bps_lag1.csv": "3d2b79dafba8475fc1a495cb23ba1d357570904f8a51f7aca986dafd7bcc1903",
+    "snapshot_cap_monthly_10bps_lag0.csv": "1281ca19e0fd876bdff3dde78a68937c1bb1fd6f5e14e425fde1dc99a55da310",
+    "snapshot_cap_monthly_10bps_lag1.csv": "6b6a556fa42611fbf748deac878b712c407d1ae7b02373c2ceb386358be98bae",
+    "snapshot_cap_monthly_25bps_lag1.csv": "4a6630989f3a532d3bf55ab587ed52093e21be2bad66f35a199854c900a025ed",
+    "snapshot_cap_weekly_10bps_lag1.csv": "0ccc4a59a0e62a55aba2e20173f4232645d4d77f01f8b942d0d4b4ed90ae89c4",
+    "snapshot_cap_yearly_10bps_lag1.csv": "b3bcaf13d6a3ca84330dc9ee9641bffc3700df86f314a0ab919a0dddc8630604"
+  },
+  "limits": [
+    "Later constituent list and constant later market-cap weights create survivorship and look-ahead bias.",
+    "Equal-weight sensitivity removes the cap snapshot, not the survivor-universe selection.",
+    "Legacy stock model is a multiplicative volatility-ratio LSTM, not the index additive-residual model.",
+    "Cached forecast training is not rerun or independently authenticated; extreme/invalid forecasts remain a model-quality warning.",
+    "The close-d risk-ratio signal uses forecast dated d and trailing vol through d; it is not a fresh d+2 forecast.",
+    "Next-close fill and proportional costs are assumptions; no spreads, volumes, capacity or realized execution data.",
+    "^GSPC price index versus adjusted-close stocks is not a matched total-return alpha comparison.",
+    "Sharpe uses a fixed daily risk-free assumption, not historical rates.",
+    "Bootstrap intervals condition on this inspected, biased sample and cannot cure those biases.",
+    "No matched GARCH-only forecast panel; no causal attribution of portfolio improvement to LSTM."
+  ]
+}

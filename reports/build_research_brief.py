@@ -15,6 +15,7 @@ from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, T
 
 from build_corrected_report import INK, TEAL, GRAY, WIDTH, fonts, footer, p, table
 from build_final_report import load_evidence
+from build_portfolio_report import load_portfolio, build_portfolio_chart, primary_table
 
 
 ROOT_URL = "https://github.com/SRG-eddieliu/rnn-volatility-lab"
@@ -57,8 +58,17 @@ def build_chart(additive, destination):
 
 
 def build(directory, destination):
+    protected = [directory/name for name in ("volatility-final-report.pdf",
+                 "volatility-portfolio-overlay.pdf", "volatility-complete-report.pdf")]
+    if destination.resolve() in {path.resolve() for path in protected}:
+        raise ValueError("The brief must not overwrite a full or companion report.")
+    protected_hashes = {path: hashlib.sha256(path.read_bytes()).hexdigest()
+                        for path in protected if path.exists()}
     fonts()
     parent, additive = load_evidence(directory)
+    portfolio, _, portfolio_primary, portfolio_interval = load_portfolio(directory)
+    portfolio_chart = directory / "figures/portfolio-sharpe-difference.png"
+    build_portfolio_chart(portfolio, portfolio_chart)
     rows = {row["model"]: row for row in additive["metrics"]}
     benchmark = {row["model"]: row for row in parent["metrics"]}
     raw, floored, garch = [rows[key] for key in ("additive_raw", "additive_clipped", "garch_t")]
@@ -72,8 +82,6 @@ def build(directory, destination):
         raise ValueError("Reassess the benchmark comparison against the changed evidence.")
     full_report = directory / "volatility-final-report.pdf"
     full_hash = hashlib.sha256(full_report.read_bytes()).hexdigest()
-    if destination.resolve() == full_report.resolve():
-        raise ValueError("The brief must not overwrite the full report.")
     chart = directory / "figures" / "research-brief-results.png"
     build_chart(additive, chart)
 
@@ -99,7 +107,7 @@ def build(directory, destination):
     ]))
 
     story = [
-        p("QUANTITATIVE RESEARCH BRIEF / SEPTEMBER 2026", "kicker"),
+        p("RESEARCH BRIEF / PART A: INDEX FORECASTING", "kicker"),
         Paragraph("Volatility Forecasting<br/>with Residual Learning", title),
         p("<b>Eddie Liu</b> | GARCH, LSTM, and empirical model evaluation", "small"),
         Paragraph(f"An additive LSTM reduces observed forecast MSE by <b>"
@@ -125,69 +133,51 @@ def build(directory, destination):
           f"Floored QLIKE is {floored['qlike']:,.0f}, versus {garch['qlike']:.4f} for GARCH; "
           "lower is better. Lower MSE alone is not a deployable-model result."),
         PageBreak(),
-        p("METHOD, COMPARISON, AND IMPLICATIONS", "kicker"),
-        p("What the experiment establishes", "h1"),
-        p("Controlled historical evaluation", "h2"),
-        table([
-            ["Sample", f"{additive['test_start']} to {additive['test_end']}; cached ^GSPC "
-             "prices from 2003-2024. One index; one training-seed schedule."],
-            ["Timing", "21 lagged input rows ending at t-1. Training-only scaling; expanding "
-             "training history, 252 validation observations, and 21-day non-overlapping test blocks."],
-            ["Model family", "GARCH-t, EWMA, historical variance, six log-target/log-ratio "
-             "LSTM/GRU specifications, and one signed-residual LSTM. Eight recurrent units; "
-             "validation-based early stopping."],
-        ], [86, 418], compact=True),
-        p("Same-date forecast comparison", "h2"),
-    ]
-    score_rows = [["Model / family", "MSE / 10^-7", "QLIKE"]]
-    for key in ("garch_t", "ewma94", "rv21"):
-        row = benchmark[key]
-        score_rows.append([row["label"], f"{row['mse']/1e-7:.4f}", f"{row['qlike']:.4f}"])
-    score_rows.append([
-        "Log-target / log-ratio RNNs (6)",
-        f"{min(r['mse'] for r in neural)/1e-7:.4f} to {max(r['mse'] for r in neural)/1e-7:.4f}",
-        f"{min(r['qlike'] for r in neural):.4f} to {max(r['qlike'] for r in neural):.4f}",
-    ])
-    score_rows += [
-        ["Additive LSTM: raw", f"{raw['mse']/1e-7:.4f}", "Undefined"],
-        ["Additive LSTM: floored", f"{floored['mse']/1e-7:.4f}", f"{floored['qlike']:,.1f}"],
-    ]
-    story += [
-        table(score_rows, [230, 130, 144], compact=True),
-        p("Lower is better for both losses. The RNN row gives separate metric ranges across "
-          "six specifications, not one model. Raw and floored additive rows use the same fitted "
-          "LSTM. Raw QLIKE is undefined for nonpositive variance forecasts.", "small"),
-        p("Three research takeaways", "h2"),
-        p("<b>Objective alignment matters.</b> Signed-residual MSE matches raw variance-forecast "
-          "MSE. Log-target MSE is different; all six log-target/log-ratio candidates lose to GARCH "
-          "on both reported losses."),
-        p("<b>Error and validity are separate.</b> A floor does not solve positivity or calibration. "
-          "The primary MSE interval includes zero, with significance sensitive to block length."),
-        p("<b>The workflow is inspectable.</b> Python code includes chronological splits, daily "
-          "GARCH updates, matched-date scoring, source hashes, tests, and a synthetic offline demo."),
-        p("Scope and next experiment", "h2"),
-        p("The additive model was tested after inspecting this historical sample, not on an "
-          "untouched holdout. No trading alpha or production validation is claimed. Proposed next "
-          "test: positive, mean-targeted forecasts across multiple seeds and new data; not yet run.", "small"),
-        p(f'<b><link href="{ROOT_URL}/blob/main/reports/volatility-final-report.pdf">Full report (6 pages)</link>'
-          f' | <link href="{ROOT_URL}">Code, demo, and evidence</link></b>', "small"),
-        p("Sources: reports/corrected_results.json and reports/additive_results.json. Full raw "
-          "market snapshots and predictions are not bundled. Based on a collaborative research "
-          "project; this brief is prepared by Eddie Liu.", "small"),
+        p("PART B / SEPARATE STOCK PORTFOLIO DIAGNOSTIC", "kicker"),
+        p("Dynamic Portfolio Weighting", "h1"),
+        p("The legacy stock model applies an LSTM ratio correction to GARCH volatility. "
+          "It is a separate model and sample from Part A, not a trading application of its "
+          "additive-residual predictions."),
+        p("The allocation rule", "h2"),
+        p("Weight = base weight x clip(trailing vol / saved forecast, 0.5, 1.5), then normalize. "
+          "Compare the tilt with the same eligible stocks and base weights without the tilt."),
+        primary_table(portfolio_primary, compact=True),
+        p(f"{portfolio['data']['observations']:,} return dates: {portfolio['data']['start']} to "
+          f"{portfolio['data']['end']}. Monthly rebalance; 10 bps per dollar bought/sold; "
+          "next-close execution. Sharpe uses a constant assumed daily risk-free return of 0.0001.", "small"),
+        Image(str(portfolio_chart), width=WIDTH, height=150),
+        p(f"Primary snapshot-cap Sharpe difference: {portfolio_interval['difference']:+.4f}; "
+          f"95% paired temporal interval [{portfolio_interval['ci95_lower']:+.4f}, "
+          f"{portfolio_interval['ci95_upper']:+.4f}]. Mean block 21, 2,000 resamples. "
+          "The small gross benefit disappears under the primary cost assumption.", "small"),
+        p("What the implementation adds", "h2"),
+        p("Aligned holding periods, drifting weights, self-financing costs, trading-session "
+          "rebalancing and explicit invalid-forecast fallback. An independent dollar-position "
+          "calculation reconciles the primary portfolio results."),
+        p("What the results do not establish", "h2"),
+        p("The later constituent list and repeated later cap snapshot create survivorship and "
+          "look-ahead bias. Equal weighting does not fix that universe. Cached stock forecasts "
+          "were not retrained. These are retrospective accounting diagnostics, not validated "
+          "alpha; Part A's MSE change cannot explain Part B's Sharpe.", "small"),
+        p(f'<b><link href="{ROOT_URL}/blob/main/reports/volatility-complete-report.pdf">Full research report (8 pages)</link>'
+          f' | <link href="{ROOT_URL}">Code and evidence</link></b>', "small"),
+        p("Sources: reports/additive_results.json and reports/portfolio_overlay_results.json; "
+          "full raw data are not bundled. Based on collaborative research; brief prepared by Eddie Liu.", "small"),
     ]
     destination.parent.mkdir(parents=True, exist_ok=True)
     document = SimpleDocTemplate(
         str(destination), pagesize=(612, 792), leftMargin=54, rightMargin=54,
-        topMargin=40, bottomMargin=59, title="Volatility Forecasting - Research Brief",
-        author="Eddie Liu", subject="Two-page summary of a historical variance-forecast study",
+        topMargin=40, bottomMargin=59, title="Volatility Research - Forecasts and Portfolio Overlays",
+        author="Eddie Liu", subject="Two separate experiments: index forecasts and stock portfolio diagnostics",
         creator="Eddie Liu - research portfolio",
     )
     document.build(story, onFirstPage=footer("Research Brief"), onLaterPages=footer("Research Brief"))
     count = len(PdfReader(destination).pages)
     if count != 2:
         raise ValueError(f"Expected two pages; got {count}.")
-    if hashlib.sha256(full_report.read_bytes()).hexdigest() != full_hash:
-        raise ValueError("The full report changed unexpectedly.")
+    if any(hashlib.sha256(path.read_bytes()).hexdigest() != digest
+           for path, digest in protected_hashes.items()):
+        raise ValueError("A full or companion report changed unexpectedly.")
     print(f"Built {destination} (2 pages); full report unchanged: {full_hash}")
 
 

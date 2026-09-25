@@ -1,10 +1,10 @@
 # RNN Volatility Lab
 
-A controlled study of one-day S&P 500 variance forecasts using GARCH, LSTM, GRU, and residual-learning models.
+A study of equity-index volatility forecasts, plus a separate retrospective diagnostic of stock portfolio volatility tilts.
 
-**[Research brief (2 pages)](reports/volatility-research-brief.pdf)** | **[Full report (6 pages)](reports/volatility-final-report.pdf)** | **[Code](src)** | **[Demo](#quick-offline-demo)**
+**[Research brief (2 pages)](reports/volatility-research-brief.pdf)** | **[Full report (8 pages)](reports/volatility-complete-report.pdf)** | **[Code](src)** | **[Demo](#quick-offline-demo)**
 
-3,738 common test dates, 178 expanding-window folds, and explicit checks of error, positivity, calibration, and temporal uncertainty. This is a single-seed historical study, not a trading-alpha claim or production model.
+The index forecast study uses 3,738 common test dates and 178 expanding-window folds. The portfolio diagnostic uses a different, legacy stock-model panel over 2,390 return dates. These are separate experiments, not one validated prediction-to-trading pipeline.
 
 [![Forecast regression tests](https://github.com/SRG-eddieliu/rnn-volatility-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/SRG-eddieliu/rnn-volatility-lab/actions/workflows/tests.yml)
 
@@ -28,15 +28,39 @@ aggregate evidence, without rerunning or modifying the historical experiment.
 
 ## Research and Results
 
-Start with the [two-page research brief](reports/volatility-research-brief.pdf) for the question, approach, and key findings. The [six-page report](reports/volatility-final-report.pdf) preserves the complete methods, results, uncertainty, and reproducibility details. The study compares nine benchmark/log-target specifications plus one additive-residual LSTM with raw and floored outputs on **3,738 identical dates**, February 5, 2010 to December 11, 2024.
+Start with the [two-page research brief](reports/volatility-research-brief.pdf): page one covers index forecasting; page two covers the separate stock portfolio diagnostic. The [eight-page report](reports/volatility-complete-report.pdf) includes both studies. The [six-page forecast-only report](reports/volatility-final-report.pdf) is preserved unchanged.
 
-Results are reported whether or not a neural model improves on a simple baseline. The analysis distinguishes implementation correctness, positivity, calibration, and loss-based performance. No strategy P&L or Sharpe-ratio improvement is claimed.
+The forecast study compares nine benchmark/log-target specifications plus one additive-residual LSTM with raw and floored outputs on **3,738 identical dates**, February 5, 2010 to December 11, 2024.
+
+Results are reported whether or not a neural model improves on a simple baseline. The forecast analysis distinguishes implementation correctness, positivity, calibration, and loss-based performance. Its MSE results do not establish portfolio P&L or Sharpe improvement.
 
 **Main finding:** the additive-residual LSTM lowers observed MSE by **5.48%** versus GARCH, from `1.600623e-7` to `1.512933e-7` with a fixed `1e-12` floor. The unbounded output improves MSE by **5.45%**. However, there are **60 nonpositive raw forecasts**, floored QLIKE is approximately **457,801** versus GARCH's **-8.4613**, and the primary 95% paired temporal interval for the MSE difference includes zero. This is an observed MSE improvement, not demonstrated robust or deployable variance forecasting.
 
 GARCH beats all six log-target/log-ratio neural candidates on MSE and QLIKE. The additive specification was tested in a separate run after inspecting the historical sample, using the same 178 folds, benchmark predictions, architecture, seed schedule, and training budget. Neither experiment is an untouched holdout.
 
-## Implementation
+## Portfolio Construction and Economic Value
+
+The legacy stock model uses **GARCH volatility multiplied by an LSTM ratio correction**, not the index additive-residual model above. Targets multiply a base allocation by `clip(trailing_vol / saved_forecast, 0.5, 1.5)` and renormalize. The repaired engine uses next-close execution, simple stock returns, drifting weights, actual traded dollars, self-financing costs, and real trading-session rebalance dates.
+
+**Primary comparison: monthly, 10 bps per dollar bought/sold, 2015-07-06 to 2024-12-31.**
+
+| Same-universe diagnostic | Net Sharpe | Maximum drawdown |
+| --- | ---: | ---: |
+| Snapshot-cap base | 1.119 | -33.25% |
+| Snapshot-cap + volatility tilt | 1.115 | -32.51% |
+| Equal-weight base | 0.738 | -38.34% |
+| Equal-weight + volatility tilt | 0.728 | -38.18% |
+
+The primary Sharpe difference is **-0.0038**, with a paired 95% temporal interval of **[-0.0289, +0.0194]**. Drawdown improves modestly in this sample, but there is no resolved incremental Sharpe benefit. The small gross Sharpe advantage disappears at the primary cost assumption. All frequency/cost sensitivities are reported, not just the highest-performing setting.
+
+**Retrospective diagnostic, not point-in-time alpha:** the source repeats later market caps across history and uses a later survivor list. Equal weighting does not fix survivor bias. Cached stock forecasts were not retrained or independently reproduced; 76 nonpositive forecasts receive neutral tilts rather than being interpreted as low risk. The S&P 500 price index is context, not a matched total-return comparator. Sharpe uses an assumed constant daily risk-free return of 0.0001. These figures do not validate achievable returns or isolate an LSTM contribution.
+
+- [Portfolio diagnostic (2 pages)](reports/volatility-portfolio-overlay.pdf)
+- [Fixed protocol, timing, costs, and data limits](docs/portfolio-overlay-protocol.md)
+- [All aggregate results, sensitivities, and source hashes](reports/portfolio_overlay_results.json)
+- [Portfolio engine](src/evaluation/portfolio.py) and [regression tests](tests/test_portfolio.py)
+
+## Forecast Implementation
 
 1. **GARCH state updating:** daily conditional-variance recursion between 21-observation parameter refits.
 2. **Chronological transforms:** training-only scaling, lagged inputs, and matching neural train/validation/test dates after GARCH warmup.
@@ -82,12 +106,28 @@ python scripts/evaluate_additive_residual.py \
 python -m pip install -r requirements-report.txt
 python reports/build_readme_figure.py
 python reports/build_final_report.py
+python reports/build_portfolio_report.py
 python reports/build_research_brief.py
 ```
 
 The raw price snapshot, VIX snapshot, complete predictions, gates, and training logs are **not bundled**. Supply appropriately sourced input snapshots; the aggregate artifact records the exact hashes used for this run. Providing different input bytes creates a different experiment. VIX is used only for ex-post gate diagnostics, not as a training feature.
 
 Full training is not a lightweight test. The runner uses separate model processes, bounded worker counts, checkpointed outputs, and run signatures. Reuse an output directory only with matching inputs/code/configuration. Use a separate directory for smoke tests or alternative seeds.
+
+### Portfolio Diagnostic
+
+The portfolio runner requires the three local CSV inputs described in the protocol; it neither downloads data nor trains a stock model. Review the source limitations before acknowledging them. Keep daily outputs in the ignored `runs/` directory, not in published reports.
+
+```bash
+python scripts/evaluate_portfolio_overlay.py \
+  --input-dir /path/to/legacy-portfolio-inputs \
+  --daily-output runs/portfolio-diagnostic \
+  --acknowledge-retrospective-data
+python reports/build_portfolio_report.py
+python reports/build_research_brief.py
+```
+
+The aggregate results include a replay of the old notebook scores for provenance only. Those replay rows deliberately retain old accounting defects and are not the repaired result. Historical vendor inputs and per-stock forecasts are not distributed.
 
 ## Evaluation
 
@@ -106,10 +146,12 @@ Calendar diagnostics, level calibration, positive-forecast checks, and gate/VIX 
 | [src/data](src/data) | Return features and chronological splits |
 | [src/models](src/models) | GARCH recursion, neural fitting, positive reconstruction |
 | [src/losses](src/losses) | Original-scale forecast losses |
+| [src/evaluation/portfolio.py](src/evaluation/portfolio.py) | Self-financing long-only overlay accounting, timing, drift, and metrics |
 | [scripts](scripts) | Preparation, training, and evaluation workflow |
 | [tests](tests) | Regression, bootstrap, and optional CPU integration checks |
 | [reports/build_final_report.py](reports/build_final_report.py) | Standalone research report from the public aggregate evidence |
-| [reports/build_research_brief.py](reports/build_research_brief.py) | Two-page high-level brief; leaves the full report unchanged |
+| [reports/build_portfolio_report.py](reports/build_portfolio_report.py) | Portfolio diagnostic and combined report; preserves the forecast-only PDF |
+| [reports/build_research_brief.py](reports/build_research_brief.py) | Two-page brief with separate forecast and portfolio panels |
 | [docs/validation-status.md](docs/validation-status.md) | Completed checks and unresolved research limits |
 
 ### Supporting Evidence

@@ -1,5 +1,33 @@
 # Validation Status
 
+## Portfolio Extension - September 25, 2026
+
+The separate stock portfolio accounting diagnostic is now implemented and rerun.
+Fourteen new unit tests cover weighted simple returns, weight drift, execution
+lags, holiday schedules, self-financing transaction costs, missing held returns,
+future-data invariance, neutral forecast fallback, and performance definitions.
+The full lightweight suite passes 38 tests; four unchanged TensorFlow integration
+tests are optional and were not rerun for this extension.
+
+A separate dollar-position calculation, using bisection instead of the engine's
+fixed-point cost solution, reconciles all 2,390 primary daily returns, NAVs, costs
+and traded notionals for the cap base and overlay. The largest daily-return
+disagreement is below 6e-16. The saved original notebook Sharpes are also reproduced
+from the same inputs, but those legacy values retain the old accounting defects.
+
+Monthly net Sharpe is 1.119 for the matched cap base and 1.115 for the tilt;
+the paired primary interval includes zero. The source is **not point-in-time**:
+one later cap snapshot and a survivor stock list are reused across history.
+Stock forecasts are a different multiplicative model, were not retrained, and
+lack complete independently verifiable training logs. The diagnostic does not
+validate alpha or show that the index forecasting MSE change improves trading.
+See [protocol](portfolio-overlay-protocol.md) and
+[aggregate evidence](../reports/portfolio_overlay_results.json).
+
+The forecast-only validation notes below describe Part A, not the portfolio
+extension. The six-page forecast PDF and all forecast experiment scores remain
+unchanged; the eight-page report appends the distinct portfolio diagnostic.
+
 Corrected historical experiment: September 24, 2026.
 
 **Ready within the tested implementation scope; share research findings with the limitations below.** The previously documented GARCH-state and target-inverse defects have been repaired. Six neural specifications were freshly trained across 178 folds on a common sample. This does not amount to independent production validation or a prospective alpha study.
