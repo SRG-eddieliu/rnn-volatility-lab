@@ -42,7 +42,7 @@ def build():
     floored=metrics["additive_clipped"]
     fig.text(.04,.18, f"Observed MSE change: {floored['mse_change_pct_vs_garch']:.2f}% | both intervals include zero", fontsize=12, fontweight="bold")
     fig.text(.04,.12, f"{data['raw_nonpositive_count']} nonpositive raw forecasts; floored QLIKE {floored['qlike']:,.0f} vs GARCH {metrics['garch_t']['qlike']:.4f}.", color="#555555")
-    fig.text(.04,.065, "Historical follow-up, not an untouched holdout. Intervals condition on trained forecasts; no seed or selection adjustment.", fontsize=9, color="#555555")
+    fig.text(.04,.065, "Historical study, not an untouched holdout. Intervals condition on trained forecasts; no seed or selection adjustment.", fontsize=9, color="#555555")
     fig.text(.04,.025, "Source: reports/additive_results.json | paired stationary bootstrap, mean block 21, 2,000 resamples", fontsize=9, color="#555555")
     destination = root / "figures" / "additive-summary.png"
     destination.parent.mkdir(parents=True, exist_ok=True)
