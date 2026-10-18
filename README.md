@@ -1,5 +1,7 @@
 # RNN Volatility Lab
 
+**Starpoint Research Group · Volatility forecasting research software**
+
 A study of equity-index volatility forecasts, plus a separately retrained stock-level GARCH/LSTM model and dynamic portfolio-weighting experiment.
 
 **[Research brief (2 pages)](reports/volatility-research-brief.pdf)** | **[Full report (8 pages)](reports/volatility-complete-report.pdf)** | **[Code](src)** | **[Demo](#quick-offline-demo)**
@@ -11,6 +13,12 @@ The unchanged index study uses 3,738 common test dates and 178 expanding-window 
 [![Forecast regression tests](https://github.com/SRG-eddieliu/rnn-volatility-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/SRG-eddieliu/rnn-volatility-lab/actions/workflows/tests.yml)
 
 ![Common-date MSE and paired uncertainty: additive MSE improves but intervals include zero; positivity and QLIKE remain problematic](reports/figures/additive-summary.png)
+
+## Documentation
+
+- [Index experiment specification](docs/corrected-experiment-plan.md) and [additive-residual specification](docs/additive-residual-plan.md)
+- [Stock retraining protocol](docs/stock-overlay-retraining.md), [evaluation design](docs/stock-overlay-evaluation.md), and [failure analysis](docs/stock-retraining-findings.md)
+- [Validation status](docs/validation-status.md) and [source code map](#code-map)
 
 ## Quick Offline Demo
 
@@ -194,5 +202,3 @@ Calendar diagnostics, level calibration, positive-forecast checks, and gate/VIX 
 - [Benchmark experiment specification](docs/corrected-experiment-plan.md) and [additive specification](docs/additive-residual-plan.md)
 
 The `src` modules and reproduction commands above are the canonical implementation. Supporting notebooks and earlier report artifacts are not required reading for the current study.
-
-Based on a collaborative research project; portfolio report prepared by Eddie Liu.
